@@ -97,7 +97,9 @@ Clearly label claims that are speculative, inferred, or uncertain.
 
 ## Git Workflow
 
-Commit every completed modification to `main` and push it to `origin/main` when the remote is available.
+Commit every completed modification to `main`.
+
+After committing, try to push `main` to `origin/main`. If the push fails because network access, authentication, sandboxing, or the remote is unavailable, do not block the completed work. Report the commit hash and the push failure clearly to the user.
 
 Use small, coherent commits that describe the note or repository change. Before committing, check `git status` and avoid including unrelated local changes unless the user explicitly asks.
 
