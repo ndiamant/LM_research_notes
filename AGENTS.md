@@ -95,6 +95,12 @@ Prefer source-grounded notes over broad summaries. If using web sources, include
 
 Clearly label claims that are speculative, inferred, or uncertain.
 
+## Skill Source
+
+The tracked source for the `$write-research-note` Codex skill lives at `skills/write-research-note/`.
+
+The installed cross-project copy normally lives at `/Users/ndiamant/.codex/skills/write-research-note/`. When editing the tracked skill source, keep the installed copy in sync so Codex can use the latest workflow across projects.
+
 ## Git Workflow
 
 Commit every completed modification to `main`.

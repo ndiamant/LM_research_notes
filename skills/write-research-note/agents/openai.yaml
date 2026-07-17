@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Research Note"
+  short_description: "Create structured linked research notes"
+  default_prompt: "Use $write-research-note to add a source-grounded research note to the LM_research_notes repository."
