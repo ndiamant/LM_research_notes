@@ -2,4 +2,5 @@
 
 ## Notes
 
+- 2026-07-20: [mESC data preparation and MAP decoder addition](2026-07-20/mesc-data-preparation-and-map-decoder.md)
 - 2026-07-20: [Compile and binary verification](2026-07-20/compile-and-binary-verification.md)
