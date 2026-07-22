@@ -75,6 +75,43 @@ The dependency order was:
 
 The partition switch was applied in place with `scontrol update JobId=<job> Partition=stat,akundaje,hns` for jobs `35001642`, `35001645`, `35001651`, `35001653`, `35001716`, `35001802`, `35001804`, and `35001806`. After the switch, reference and both SRA download array tasks started immediately on `akundaje`.
 
+## Reproduction Commands
+
+The command bodies live in the scratch scripts listed below. The saved scripts now include `#SBATCH --partition=stat,akundaje,hns`, absolute log paths under `logs/`, and restart checks that skip outputs only when expected files exist and pass basic validation. To reproduce the same dependency graph from Sherlock, run:
+
+```bash
+set -euo pipefail
+
+ROOT=/scratch/users/diamant/smf_data/GSE184470_ESC_TKO_ATAC
+
+pre=$(sbatch --parsable "$ROOT/scripts/00_preflight.sbatch")
+ref=$(sbatch --parsable --dependency=afterok:$pre "$ROOT/scripts/01_reference.sbatch")
+dl=$(sbatch --parsable --dependency=afterok:$pre "$ROOT/scripts/02_download_fastq.sbatch")
+trim=$(sbatch --parsable --dependency=afterok:$dl "$ROOT/scripts/03_trim_qc.sbatch")
+align=$(sbatch --parsable --dependency=afterok:$ref:$trim "$ROOT/scripts/04_align_filter.sbatch")
+merge=$(sbatch --parsable --dependency=afterok:$align "$ROOT/scripts/05_merge.sbatch")
+tracks=$(sbatch --parsable --dependency=afterok:$merge "$ROOT/scripts/06_tracks.sbatch")
+peaks=$(sbatch --parsable --dependency=afterok:$merge "$ROOT/scripts/07_peaks.sbatch")
+final=$(sbatch --parsable --dependency=afterok:$tracks:$peaks "$ROOT/scripts/08_finalize.sbatch")
+
+printf 'preflight=%s\nreference=%s\ndownload=%s\ntrim=%s\nalign=%s\nmerge=%s\ntracks=%s\npeaks=%s\nfinalize=%s\n' \
+  "$pre" "$ref" "$dl" "$trim" "$align" "$merge" "$tracks" "$peaks" "$final" \
+  | tee "$ROOT/logs/submitted_jobs.tsv"
+
+squeue -j "$pre,$ref,$dl,$trim,$align,$merge,$tracks,$peaks,$final" \
+  -o '%.22i %.30j %.10T %.24P %.12M %.30R'
+```
+
+For a completely fresh rerun, use an empty output root or archive/remove old validated outputs first. Reusing the same root will exercise the restart logic and may skip completed steps.
+
+The in-place queue switch used during the original run was:
+
+```bash
+for job in 35001642 35001645 35001651 35001653 35001716 35001802 35001804 35001806; do
+  scontrol update JobId=$job Partition=stat,akundaje,hns
+done
+```
+
 ## Completed Work
 
 Preflight completed with exit code `0:0` and wrote `qc/preflight.txt`. It recorded scratch storage availability and module paths/versions. Scratch had about 100 TB available at workflow start.
