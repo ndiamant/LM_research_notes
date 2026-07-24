@@ -1,6 +1,6 @@
 ---
 name: write-research-note
-description: Create, update, and organize agent-written Markdown research notes in the LM_research_notes repository at /Users/ndiamant/repos/LM_research_notes. Use when the user asks Codex to add a research note, capture findings, summarize sources into a durable note, document a research decision, update a project note index, or preserve research context for later agents.
+description: Create, update, and organize agent-written Markdown research notes in the LM_research_notes repository at /home/users/diamant/repos/LM_research_notes. Use when the user asks Codex to add a research note, capture findings, summarize sources into a durable note, document a research decision, update a project note index, or preserve research context for later agents.
 ---
 
 # Write Research Note
@@ -14,7 +14,7 @@ Use this skill to add durable, source-grounded Markdown research notes to the us
 Use this notes repository by default:
 
 ```text
-/Users/ndiamant/repos/LM_research_notes
+/home/users/diamant/repos/LM_research_notes
 ```
 
 The expected remote is:
@@ -27,7 +27,7 @@ If the current task is running in a different repository, use the notes reposito
 
 ## Workflow
 
-1. Locate the target notes repository. Prefer `/Users/ndiamant/repos/LM_research_notes`; if already in that repo, use the current checkout.
+1. Locate the target notes repository. Prefer `/home/users/diamant/repos/LM_research_notes`; if already in that repo, use the current checkout.
 2. Read the target notes repository's `AGENTS.md`.
 3. Identify the target project. If the user does not specify one, infer a concise project slug from the request and existing `projects/` folders.
 4. Use the repository's required date convention. If none is specified, use the local date in the user's configured timezone.
