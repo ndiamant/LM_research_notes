@@ -47,6 +47,20 @@ If the current task is running in a different repository, use the notes reposito
 - Use relative repo links, not absolute filesystem paths, for links intended to render on GitHub.
 - Include enough context that a future agent can understand the finding or decision without reconstructing the full conversation.
 
+## Command Provenance
+
+When a note documents work that involved running commands, include enough command provenance for a future agent to reproduce, audit, or resume the work.
+
+Record:
+
+- exact commands for workflow submission, execution, validation, recovery, and reruns;
+- script paths when command bodies live in durable scripts;
+- important environment setup such as modules, env vars, working directories, roots, queues, and job dependencies;
+- job IDs, run IDs, checkpoint paths, or output roots when relevant;
+- deviations from the original plan and the commands used to patch or recover the run.
+
+Do not inline large generated scripts when they are available as durable files. Link to the scripts and include the minimal command block needed to rerun them.
+
 ## Related Notes
 
 Before writing, search existing project notes for likely related material. Use filenames, project indexes, headings, tags, and keyword search. Link only notes that are actually relevant to the new note's reasoning or context.
@@ -66,6 +80,8 @@ When the user provides source material, cite it directly in the `Sources` sectio
 If more source gathering is needed and the user has not asked for live research, ask before browsing or making external calls unless the answer would otherwise be obviously incomplete.
 
 ## Git Handling
+
+On this Stanford Sherlock server, add notes on the `sherlock` branch. Before editing, confirm the notes repository is on `sherlock`, or switch to it if doing so will not disturb unrelated local work. Commit completed note changes to `sherlock`, then attempt to push `sherlock` to `origin/sherlock`.
 
 Before staging, run `git status` and inspect the relevant diff. Stage only files related to the note task unless the user explicitly asks otherwise.
 
