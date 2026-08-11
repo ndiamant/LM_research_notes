@@ -99,13 +99,13 @@ Clearly label claims that are speculative, inferred, or uncertain.
 
 The tracked source for the `$write-research-note` Codex skill lives at `skills/write-research-note/`.
 
-The installed cross-project copy normally lives at `/Users/ndiamant/.codex/skills/write-research-note/`. When editing the tracked skill source, keep the installed copy in sync so Codex can use the latest workflow across projects.
+The installed cross-project copy normally lives at `/home/users/diamant/.codex/skills/write-research-note/`. When editing the tracked skill source, keep the installed copy in sync so Codex can use the latest workflow across projects.
 
 ## Git Workflow
 
-Commit every completed modification to `main`.
+On this Stanford Sherlock server, commit every completed modification to `sherlock`.
 
-After committing, try to push `main` to `origin/main`. If the push fails because network access, authentication, sandboxing, or the remote is unavailable, do not block the completed work. Report the commit hash and the push failure clearly to the user.
+After committing, try to push `sherlock` to `origin/sherlock`. If the push fails because network access, authentication, sandboxing, or the remote is unavailable, do not block the completed work. Report the commit hash and the push failure clearly to the user.
 
 Use small, coherent commits that describe the note or repository change. Before committing, check `git status` and avoid including unrelated local changes unless the user explicitly asks.
 
