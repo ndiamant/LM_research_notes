@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-09-10: [Swiss-Prot partition-schedule results](2026-09-10/swissprot-partition-schedule-results.md)
 - 2026-09-06: [Swiss-Prot setup and matched baseline runs](2026-09-06/swissprot-setup-and-baseline-runs.md)
 - 2026-08-11: [Conditional REINFORCE antibiotic-oracle pilot](2026-08-11/conditional-reinforce-antibiotic-oracle-pilot.md)
 - 2026-08-11: [Portable Morgan fingerprint antibiotic-activity oracle](2026-08-11/morgan-antibiotic-oracle.md)
