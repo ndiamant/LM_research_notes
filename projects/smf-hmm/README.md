@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-09-16: [Multi-TF motif caches and state-call visualization plan](2026-09-16/multi-tf-motif-cache-and-state-call-visualization.md)
 - 2026-09-04: [Fixed-HMM posterior-sampling baseline comparison](2026-09-04/fixed-hmm-posterior-sampling-comparison.md)
 - 2026-09-04: [Simple interpolation baseline against chr1 CTCF ChIP–nexus](2026-09-04/simple-interpolation-ctcf-chip-benchmark.md)
 - 2026-09-02: [CTCF motif and local-control ChIP–nexus signal collection](2026-09-02/ctcf-motif-chip-nexus-local-controls.md)
