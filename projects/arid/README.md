@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-09-18: [Swiss-Prot INDIGO vs AR — memorization confounds, ELBO advantage, and a shared data ceiling](2026-09-18/swissprot-indigo-memorization-confound-and-data-limit.md)
 - 2026-09-18: [Cost of any-order INDIGO generation, and learned deletions via tombstones](2026-09-18/indigo-any-order-cost-and-tombstone-deletions.md)
 - 2026-09-16: [INDIGO autoregressive pretraining status and Swiss-Prot plan](2026-09-16/indigo-ar-pretraining-and-protein-plan.md)
 - 2026-09-15: [Swiss-Prot temperature-1 results and append-3 supervision scaling](2026-09-15/swissprot-temperature-1-and-supervision-scaling.md)
