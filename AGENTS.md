@@ -95,11 +95,28 @@ Prefer source-grounded notes over broad summaries. If using web sources, include
 
 Clearly label claims that are speculative, inferred, or uncertain.
 
+## Agent Instruction File
+
+`CLAUDE.md` in the repository root is a symlink to this file. Codex and Claude Code read the same contract; edit `AGENTS.md` only.
+
 ## Skill Source
 
-The tracked source for the `$write-research-note` Codex skill lives at `skills/write-research-note/`.
+The tracked source for the `write-research-note` skill lives at `skills/write-research-note/`. It is agent-neutral: Codex invokes it as `$write-research-note`, Claude Code as `/write-research-note`.
 
-The installed cross-project copy normally lives at `/home/users/diamant/.codex/skills/write-research-note/`. When editing the tracked skill source, keep the installed copy in sync so Codex can use the latest workflow across projects.
+Both cross-project installs are symlinks back to the tracked source, so there is no copy to keep in sync:
+
+```text
+~/.codex/skills/write-research-note   -> skills/write-research-note/
+~/.claude/skills/write-research-note  -> skills/write-research-note/
+```
+
+Editing `skills/write-research-note/SKILL.md` updates both agents immediately. If either symlink is missing, recreate it:
+
+```bash
+ln -s /home/users/diamant/repos/LM_research_notes/skills/write-research-note ~/.claude/skills/write-research-note
+```
+
+`skills/write-research-note/agents/openai.yaml` is Codex-only interface metadata; Claude Code ignores it.
 
 ## Git Workflow
 

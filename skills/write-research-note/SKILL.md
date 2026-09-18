@@ -1,13 +1,15 @@
 ---
 name: write-research-note
-description: Create, update, and organize agent-written Markdown research notes in the LM_research_notes repository at /home/users/diamant/repos/LM_research_notes. Use when the user asks Codex to add a research note, capture findings, summarize sources into a durable note, document a research decision, update a project note index, or preserve research context for later agents.
+description: Create, update, and organize agent-written Markdown research notes in the LM_research_notes repository at /home/users/diamant/repos/LM_research_notes. Use when the user asks to add a research note, capture findings, summarize sources into a durable note, document a research decision, update a project note index, or preserve research context for later agents.
 ---
 
 # Write Research Note
 
 ## Overview
 
-Use this skill to add durable, source-grounded Markdown research notes to the user's dedicated notes repository. Treat that repository's `AGENTS.md` as the highest-priority local contract for directory layout, note format, linking, indexing, and git workflow.
+Use this skill to add durable, source-grounded Markdown research notes to the user's dedicated notes repository. Treat that repository's `AGENTS.md` as the highest-priority local contract for directory layout, note format, linking, indexing, and git workflow. (`CLAUDE.md` in that repo is a symlink to `AGENTS.md`; they are the same contract.)
+
+This skill is agent-neutral. Codex invokes it as `$write-research-note`; Claude Code invokes it as `/write-research-note`.
 
 ## Target Repository
 
