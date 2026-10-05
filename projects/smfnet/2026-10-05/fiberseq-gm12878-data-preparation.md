@@ -272,5 +272,23 @@ need dropping) and use a separate `hydra.run.dir`.
 - ENCODE: SCREEN v3 cCREs `ENCFF733BFV`; GM12878 ATAC `ENCFF614SMH` (IDR) and
   `ENCFF158ORB` (pseudoreplicated); hg38 blacklist v2,
   <https://github.com/Boyle-Lab/Blacklist>.
-- Vollger et al. 2025, *A haplotype-resolved view of human gene regulation*
-  (FIRE), `s3://stergachis-manuscript-data/2024/Vollger_et_al/FIRE/`.
+- **Data source for GM12878 (and COLO829T/BL):** Vollger MR, Swanson EG, Neph SJ,
+  …, Stergachis AB. *A haplotype-resolved view of human gene regulation.* bioRxiv,
+  doi [10.1101/2024.06.14.599122](https://doi.org/10.1101/2024.06.14.599122)
+  (PMID 40501892, PMC12157683). This is the FIRE paper; the data are at
+  `s3://stergachis-manuscript-data/2024/Vollger_et_al/FIRE/`. It was preprint-only
+  according to the August 2026 dataset survey; check for a journal version before
+  citing.
+- Jurkat, THP1 and A549 Fiber-seq (not used in this run): SRA `SRP674059` /
+  BioProject `PRJNA1417779`, *Somatic epimutations cap genetic determinism in the human
+  diploid chromatin epigenome*.
+- Given from memory and not checked against the papers in this session; verify before
+  citing:
+  - Fiber-seq: Stergachis et al. 2020, *Science* 368:1449.
+  - fibertools m6A calling: Jha et al. 2024, *Genome Research*.
+  - cCRE registry: ENCODE Project Consortium 2020, *Nature* 583:699.
+  - Blacklist: Amemiya, Kundaje & Boyle 2019, *Scientific Reports* 9:9354.
+  - Split: ChromBPNet, Pampari et al., bioRxiv 2024.
+  - Mouse bait regions: Sönmezer et al. 2021, *Molecular Cell*.
+- The citation list is also kept in `data_preparation/fiberseq/README.md` (Citations
+  section).
