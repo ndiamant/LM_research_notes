@@ -1,0 +1,13 @@
+{
+  "paths": {
+    "MEL": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/MEL/test_sample/samples.h5",
+    "C2C12": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/C2C12/test_sample/samples.h5",
+    "NP": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/NP/test_sample/samples.h5",
+    "ES": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/ES/test_sample/samples.h5"
+  },
+  "shared_regions": 30712,
+  "sampled": 1500,
+  "analyzed": 1205,
+  "seed": 7,
+  "config": "DifferentialConfig() defaults"
+}

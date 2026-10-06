@@ -1,0 +1,76 @@
+3000 regions, 18000 region-pair rows
+Regions with >=10 eligible sites: 2526 (84%)
+Regions with >=10 eligible pairs: 2363 (79%)
+Profile noise, binomial/bootstrap: median 1.004 (IQR 0.980-1.029, n=1554)
+
+=== profile (pp), n=15156 region-pairs ===
+Quantiles 5%  10%  25%  50%  75%  90%  95%
+selection    0.0    4.5    8.4   12.6   17.4   22.6   26.0
+evaluation   5.1    6.8    9.4   12.8   17.0   22.0   25.6
+Spearman(selection, evaluation) = 0.677
+Evaluation energy/noise: median 4.58
+Offset fraction of evaluation energy: median 0.31, >0.5 in 30%
+Median selection effect by pair: C2C12-ES 15.3, C2C12-NP 14.5, MEL-C2C12 11.1, MEL-ES 13.1, MEL-NP 12.3, NP-ES 9.2
+
+  proposed 2/5/10: same bin in both sets 68%, within one bin 91%
+          <2:  6.6% of rows; evaluation effect median   8.5 (IQR   6.2- 11.0); evaluation in same bin 7%
+         2-5:  4.7% of rows; evaluation effect median   8.4 (IQR   6.2- 11.1); evaluation in same bin 12%
+        5-10: 22.6% of rows; evaluation effect median   9.7 (IQR   7.6- 12.1); evaluation in same bin 46%
+        >=10: 66.1% of rows; evaluation effect median  14.9 (IQR  11.6- 19.1); evaluation in same bin 85%
+
+  5/10/20: same bin in both sets 59%, within one bin 94%
+          <5: 11.2% of rows; evaluation effect median   8.4 (IQR   6.2- 11.0); evaluation in same bin 17%
+        5-10: 22.6% of rows; evaluation effect median   9.7 (IQR   7.6- 12.1); evaluation in same bin 46%
+       10-20: 50.1% of rows; evaluation effect median  13.5 (IQR  10.7- 16.5); evaluation in same bin 73%
+        >=20: 16.1% of rows; evaluation effect median  21.8 (IQR  17.9- 26.2); evaluation in same bin 62%
+
+  8/12/18: same bin in both sets 51%, within one bin 91%
+          <8: 22.6% of rows; evaluation effect median   8.8 (IQR   6.6- 11.3); evaluation in same bin 40%
+        8-12: 23.8% of rows; evaluation effect median  10.8 (IQR   8.7- 13.1); evaluation in same bin 45%
+       12-18: 31.0% of rows; evaluation effect median  13.8 (IQR  11.2- 16.5); evaluation in same bin 52%
+        >=18: 22.5% of rows; evaluation effect median  20.2 (IQR  16.4- 24.6); evaluation in same bin 66%
+
+  10/20: same bin in both sets 66%, within one bin 99%
+         <10: 33.9% of rows; evaluation effect median   9.3 (IQR   7.1- 11.8); evaluation in same bin 58%
+       10-20: 50.1% of rows; evaluation effect median  13.5 (IQR  10.7- 16.5); evaluation in same bin 73%
+        >=20: 16.1% of rows; evaluation effect median  21.8 (IQR  17.9- 26.2); evaluation in same bin 62%
+
+  10/15: same bin in both sets 60%, within one bin 95%
+         <10: 33.9% of rows; evaluation effect median   9.3 (IQR   7.1- 11.8); evaluation in same bin 58%
+       10-15: 30.1% of rows; evaluation effect median  12.3 (IQR   9.9- 14.7); evaluation in same bin 51%
+        >=15: 36.0% of rows; evaluation effect median  18.0 (IQR  14.3- 22.3); evaluation in same bin 71%
+
+=== covariation (x100 correlation), n=14178 region-pairs ===
+Quantiles 5%  10%  25%  50%  75%  90%  95%
+selection    0.0    7.8   13.2   17.7   22.8   28.4   32.1
+evaluation   9.4   11.6   14.5   17.8   21.8   26.4   29.6
+Spearman(selection, evaluation) = 0.454
+Evaluation energy/noise: median 2.87
+Median selection effect by pair: C2C12-ES 19.0, C2C12-NP 16.7, MEL-C2C12 16.1, MEL-ES 20.2, MEL-NP 17.5, NP-ES 17.4
+
+  proposed 2/5/10: same bin in both sets 83%, within one bin 93%
+          <2:  6.0% of rows; evaluation effect median  14.8 (IQR  10.7- 18.6); evaluation in same bin 7%
+         2-5:  1.2% of rows; evaluation effect median  14.6 (IQR  11.8- 17.5); evaluation in same bin 1%
+        5-10:  7.0% of rows; evaluation effect median  15.0 (IQR  12.3- 18.2); evaluation in same bin 9%
+        >=10: 85.8% of rows; evaluation effect median  18.2 (IQR  15.0- 22.3); evaluation in same bin 96%
+
+  10/20/30: same bin in both sets 54%, within one bin 95%
+         <10: 14.2% of rows; evaluation effect median  14.9 (IQR  11.7- 18.3); evaluation in same bin 16%
+       10-20: 48.0% of rows; evaluation effect median  16.7 (IQR  14.0- 19.6); evaluation in same bin 72%
+       20-30: 30.4% of rows; evaluation effect median  20.3 (IQR  16.8- 24.0); evaluation in same bin 47%
+        >=30:  7.4% of rows; evaluation effect median  26.4 (IQR  21.3- 31.7); evaluation in same bin 32%
+
+  12/18/25: same bin in both sets 43%, within one bin 88%
+         <12: 20.1% of rows; evaluation effect median  15.1 (IQR  12.2- 18.3); evaluation in same bin 24%
+       12-18: 31.6% of rows; evaluation effect median  16.4 (IQR  13.9- 19.3); evaluation in same bin 53%
+       18-25: 30.9% of rows; evaluation effect median  18.9 (IQR  16.0- 22.3); evaluation in same bin 46%
+        >=25: 17.5% of rows; evaluation effect median  23.5 (IQR  19.1- 28.4); evaluation in same bin 41%
+
+  15/25: same bin in both sets 56%, within one bin 97%
+         <15: 33.8% of rows; evaluation effect median  15.4 (IQR  12.6- 18.5); evaluation in same bin 46%
+       15-25: 48.8% of rows; evaluation effect median  18.1 (IQR  15.2- 21.4); evaluation in same bin 67%
+        >=25: 17.5% of rows; evaluation effect median  23.5 (IQR  19.1- 28.4); evaluation in same bin 41%
+
+  20: same bin in both sets 71%, within one bin 100%
+         <20: 62.2% of rows; evaluation effect median  16.3 (IQR  13.5- 19.4); evaluation in same bin 79%
+        >=20: 37.8% of rows; evaluation effect median  21.0 (IQR  17.3- 25.4); evaluation in same bin 58%

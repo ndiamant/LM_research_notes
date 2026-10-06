@@ -1,0 +1,244 @@
+{
+  "analyzed_regions": 30712,
+  "cell_types": [
+    "MEL",
+    "C2C12",
+    "NP",
+    "ES"
+  ],
+  "common_regions": 30712,
+  "config": {
+    "ci_resamples": 1000,
+    "covariation_bin_edges": [
+      0.2
+    ],
+    "covariation_max_separation_bp": 500,
+    "covariation_min_joint_reads": 50,
+    "covariation_min_minor_calls": 5,
+    "max_regions": null,
+    "min_correlation_pairs": 10,
+    "min_correlation_sites": 10,
+    "min_predicted_site_coverage": 10,
+    "min_site_coverage": 30,
+    "noise_resamples": 50,
+    "num_workers": 8,
+    "profile_bin_edges": [
+      0.1,
+      0.2
+    ],
+    "seed": 0,
+    "selection_fraction": 0.3
+  },
+  "excluded_regions": {
+    "C2C12": 1717,
+    "ES": 3116,
+    "MEL": 2101,
+    "NP": 2023
+  },
+  "sample_metadata": {
+    "C2C12": {
+      "assay_type": "gch_accessibility",
+      "checkpoint": "/scratch/users/diamant/smf_models/C2C12_fixed/epoch=132-step=79135.ckpt",
+      "data_config": {
+        "assay_type": "gch_accessibility",
+        "dna_sub_one_from_end_idx": false,
+        "fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+        "h5_paths": [
+          "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_C2C12_NO_combined_baitregions_2048bp_reassigned_compressed.h5"
+        ],
+        "h5_region_length": 2048,
+        "test_chrm": [
+          "chr1",
+          "chr3",
+          "chr6"
+        ],
+        "train_chrm": [
+          "chr2",
+          "chr4",
+          "chr5",
+          "chr7",
+          "chr9",
+          "chr10",
+          "chr11",
+          "chr12",
+          "chr13",
+          "chr14",
+          "chr15",
+          "chr17",
+          "chr18",
+          "chr19",
+          "chrX",
+          "chrY"
+        ],
+        "val_chrm": [
+          "chr8",
+          "chr16"
+        ]
+      },
+      "data_fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+      "dtype": "bfloat16",
+      "h5_region_length": 2048,
+      "model_input_length": 2048,
+      "num_regions": 32429,
+      "reads_per_region": 1024,
+      "sample_steps": 32,
+      "source": "split",
+      "split": "test"
+    },
+    "ES": {
+      "assay_type": "gch_accessibility",
+      "checkpoint": "/scratch/users/diamant/smf_models/ES/epoch=33-step=20910.ckpt",
+      "data_config": {
+        "assay_type": "gch_accessibility",
+        "dna_sub_one_from_end_idx": false,
+        "fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+        "h5_paths": [
+          "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_ES_NO_combined_baitregions_2048bp_reassigned_compressed.h5"
+        ],
+        "h5_region_length": 2048,
+        "test_chrm": [
+          "chr1",
+          "chr3",
+          "chr6"
+        ],
+        "train_chrm": [
+          "chr2",
+          "chr4",
+          "chr5",
+          "chr7",
+          "chr9",
+          "chr10",
+          "chr11",
+          "chr12",
+          "chr13",
+          "chr14",
+          "chr15",
+          "chr17",
+          "chr18",
+          "chr19",
+          "chrX",
+          "chrY"
+        ],
+        "val_chrm": [
+          "chr8",
+          "chr16"
+        ]
+      },
+      "data_fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+      "dtype": "bfloat16",
+      "h5_region_length": 2048,
+      "model_input_length": 2048,
+      "num_regions": 33828,
+      "reads_per_region": 1024,
+      "sample_steps": 32,
+      "source": "split",
+      "split": "test"
+    },
+    "MEL": {
+      "assay_type": "gch_accessibility",
+      "checkpoint": "/scratch/users/diamant/smf_models/MEL/epoch=46-step=28294.ckpt",
+      "data_config": {
+        "assay_type": "gch_accessibility",
+        "dna_sub_one_from_end_idx": false,
+        "fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+        "h5_paths": [
+          "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_MEL_NO_combined_baitregions_2048bp_reassigned_compressed.h5"
+        ],
+        "h5_region_length": 2048,
+        "test_chrm": [
+          "chr1",
+          "chr3",
+          "chr6"
+        ],
+        "train_chrm": [
+          "chr2",
+          "chr4",
+          "chr5",
+          "chr7",
+          "chr9",
+          "chr10",
+          "chr11",
+          "chr12",
+          "chr13",
+          "chr14",
+          "chr15",
+          "chr17",
+          "chr18",
+          "chr19",
+          "chrX",
+          "chrY"
+        ],
+        "val_chrm": [
+          "chr8",
+          "chr16"
+        ]
+      },
+      "data_fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+      "dtype": "bfloat16",
+      "h5_region_length": 2048,
+      "model_input_length": 2048,
+      "num_regions": 32813,
+      "reads_per_region": 1024,
+      "sample_steps": 32,
+      "source": "split",
+      "split": "test"
+    },
+    "NP": {
+      "assay_type": "gch_accessibility",
+      "checkpoint": "/scratch/users/diamant/smf_models/NP/epoch=38-step=23322.ckpt",
+      "data_config": {
+        "assay_type": "gch_accessibility",
+        "dna_sub_one_from_end_idx": false,
+        "fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+        "h5_paths": [
+          "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_NP_NO_combined_baitregions_2048bp_reassigned_compressed.h5"
+        ],
+        "h5_region_length": 2048,
+        "test_chrm": [
+          "chr1",
+          "chr3",
+          "chr6"
+        ],
+        "train_chrm": [
+          "chr2",
+          "chr4",
+          "chr5",
+          "chr7",
+          "chr9",
+          "chr10",
+          "chr11",
+          "chr12",
+          "chr13",
+          "chr14",
+          "chr15",
+          "chr17",
+          "chr18",
+          "chr19",
+          "chrX",
+          "chrY"
+        ],
+        "val_chrm": [
+          "chr8",
+          "chr16"
+        ]
+      },
+      "data_fasta_path": "/scratch/groups/btrippe/ndiamant/mm10.fa",
+      "dtype": "bfloat16",
+      "h5_region_length": 2048,
+      "model_input_length": 2048,
+      "num_regions": 32735,
+      "reads_per_region": 1024,
+      "sample_steps": 32,
+      "source": "split",
+      "split": "test"
+    }
+  },
+  "sample_paths": {
+    "C2C12": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/C2C12/test_sample/samples.h5",
+    "ES": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/ES/test_sample/samples.h5",
+    "MEL": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/MEL/test_sample/samples.h5",
+    "NP": "/scratch/users/diamant/evaluate_SMFNet_cell_lines/NP/test_sample/samples.h5"
+  },
+  "score": "predicted versus evaluation-set observed differences between cell types",
+  "selection": "each region's observed molecules split 0.3/0.7 into selection and evaluation sets; regions binned by selection-set effect"
+}

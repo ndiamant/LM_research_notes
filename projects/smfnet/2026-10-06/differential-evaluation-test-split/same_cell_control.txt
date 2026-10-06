@@ -1,0 +1,2 @@
+profile: n=3704 region-cells; corrected effect x100: median 0.00, 75% 4.99, 90% 8.47, 95% 10.90; zero in 58%; energy/noise median 0.920
+covariation: n=3576 region-cells; corrected effect x100: median 0.00, 75% 9.06, 90% 14.15, 95% 17.46; zero in 51%; energy/noise median 0.991
