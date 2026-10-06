@@ -1,0 +1,31 @@
+{
+  "regions": 5766,
+  "assay": "gch_accessibility",
+  "rule": "DGCH",
+  "window": [
+    512,
+    1536
+  ],
+  "counts": {
+    "NP": {
+      "sites": 236947,
+      "ineligible_sites": 0,
+      "affected_regions": 0
+    },
+    "MEL": {
+      "sites": 239258,
+      "ineligible_sites": 0,
+      "affected_regions": 0
+    },
+    "ES": {
+      "sites": 245858,
+      "ineligible_sites": 0,
+      "affected_regions": 0
+    },
+    "C2C12_fixed": {
+      "sites": 237900,
+      "ineligible_sites": 0,
+      "affected_regions": 0
+    }
+  }
+}

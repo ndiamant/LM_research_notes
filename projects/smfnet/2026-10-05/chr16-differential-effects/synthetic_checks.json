@@ -1,0 +1,10 @@
+{
+  "permutation_coc_rejections_30": 30,
+  "multiplier_coc_rejections_100": 7,
+  "multiplier_profile_rejections_100": 100,
+  "changed_dependence_p": 0.001,
+  "influence_finite_difference_check": "passed",
+  "shape_coc_rejections_100": 8,
+  "shape_profile_rejections_100": 100,
+  "description": "Independent correlated binary pairs: within-pair rho=0.4, across-pair rho=0. Group B complements all calls; population correlation matrices are unchanged but means differ."
+}

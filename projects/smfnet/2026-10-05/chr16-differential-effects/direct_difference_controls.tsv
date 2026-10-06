@@ -1,0 +1,9 @@
+pair	metric	regions	testable	nominal_p05	bh_global_05	bh_pair_05	by_global_05	median_r	median_rms_significant	median_r_significant
+C2C12_fixed-C2C12_fixed	profile	150	121	4	0	0	0	0.8282048146729568		
+ES-ES	profile	150	125	4	0	0	0	0.8526859044123527		
+MEL-MEL	profile	150	134	6	0	0	0	0.8330009579872919		
+NP-NP	profile	150	132	11	0	0	0	0.850829826976917		
+C2C12_fixed-C2C12_fixed	coc	150	97	3	0	0	0	0.9350072781740016		
+ES-ES	coc	150	114	6	0	0	0	0.9213686150318136		
+MEL-MEL	coc	150	122	7	0	0	0	0.9419753526916766		
+NP-NP	coc	150	120	6	0	0	0	0.940551085402194		

@@ -1,0 +1,27 @@
+{
+  "chromosome": "chr16",
+  "window": [
+    512,
+    1536
+  ],
+  "resamples": 1999,
+  "site_coverage": 30,
+  "joint_coverage": 50,
+  "min_minority_calls": 5,
+  "min_sites": 10,
+  "min_pairs": 10,
+  "max_pair_distance": 500,
+  "common_regions": 5766,
+  "analyzed_regions": 5766,
+  "controls": false,
+  "paths": {
+    "NP": "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_NP_NO_combined_baitregions_2048bp_reassigned_compressed.h5",
+    "MEL": "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_MEL_NO_combined_baitregions_2048bp_reassigned_compressed.h5",
+    "ES": "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_ES_NO_combined_baitregions_2048bp_reassigned_compressed.h5",
+    "C2C12_fixed": "/scratch/groups/btrippe/ndiamant/gch_SMF/20260920_SMF_MM_C2C12_NO_combined_baitregions_2048bp_reassigned_compressed.h5"
+  },
+  "shape": true,
+  "null": "equal centered normalized vectors (Pearson=1)",
+  "method": "separate-group influence-function Gaussian whole-molecule multiplier bootstrap of squared L2 differences",
+  "multiple_testing": "BH across all region-pair tests separately by metric; untestable p=1; BY sensitivity"
+}
