@@ -122,6 +122,6 @@ Suggested checks, not yet run:
 
 # Sources
 
-- SMFNet `analyses/covariation_diagnostics_20261006/diagnose.py`
+- SMFNet `analyses/covariation_diagnostics_20261006/diagnose.py` (not tracked in SMFNet; copies: [diagnose.py](covariation-differences-diagnostics/scripts/diagnose.py), [one_vs_rest.py](covariation-differences-diagnostics/scripts/one_vs_rest.py))
 - Copied artifacts: [diagnostics.tsv](covariation-differences-diagnostics/diagnostics.tsv), [metadata.json](covariation-differences-diagnostics/metadata.json)
 - Full outputs (purged after 90 days unmodified): `/scratch/users/diamant/covariation_diagnostics_20261006/`

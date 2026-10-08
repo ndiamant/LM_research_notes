@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-10-07: [GCH overfitting, regularization, EMA, and sampling-length experiments](2026-10-07/regularization-ema-sampling-experiments.md)
 - 2026-10-06: [Why SMFNet predicts cell-type differences in pair correlations weakly](2026-10-06/covariation-differences-diagnostics.md)
 - 2026-10-06: [Differential cell-type evaluation with held-out molecules, effect-size strata, and between/within-region scores](2026-10-06/differential-evaluation-held-out-molecules.md)
 - 2026-10-05: [Chr16 feasibility of differential cell-type profiles and correlation patterns](2026-10-05/chr16-differential-effects-feasibility.md)

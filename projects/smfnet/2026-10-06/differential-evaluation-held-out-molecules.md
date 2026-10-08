@@ -256,6 +256,6 @@ regenerates everything with centering.
 - SMFNet `scripts/differential_metrics.py`, `scripts/differential_metrics.md`
 - SMFNet `src/smf_net/evaluation/differential.py`, `differential_plotting.py`
 - SMFNet `tests/test_evaluation_differential.py`
-- SMFNet `analyses/differential_bins_20261006/`
+- SMFNet `analyses/differential_bins_20261006/` (not tracked in SMFNet; copies: [effect_sizes.py](differential-evaluation-test-split/scripts/effect_sizes.py), [control.py](differential-evaluation-test-split/scripts/control.py), [summarize.py](differential-evaluation-test-split/scripts/summarize.py))
 - Copied artifacts: [strata.tsv](differential-evaluation-test-split/strata.tsv), [examples.tsv](differential-evaluation-test-split/examples.tsv), [summary.tsv](differential-evaluation-test-split/summary.tsv), [analysis_metadata.json](differential-evaluation-test-split/analysis_metadata.json), [bin calibration (30%)](differential-evaluation-test-split/bin_calibration_selection30.txt), [bin calibration (50%)](differential-evaluation-test-split/bin_calibration_selection50.txt), [same-cell-type control](differential-evaluation-test-split/same_cell_control.txt), [strata figure](differential-evaluation-test-split/strata_page.png), [region mean differences, profile](differential-evaluation-test-split/region_mean_differences_profile.png)
 - Full outputs (purged after 90 days unmodified): `/scratch/users/diamant/evaluate_SMFNet_cell_lines/differential_test_cell_lines_full/`
