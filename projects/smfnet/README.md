@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-10-08: [Region count for the sampling-step appendix figure](2026-10-08/sampling-step-region-count.md)
 - 2026-10-08: [What ends observed SMF runs, and whether to bridge missing gaps in run-length metrics](2026-10-08/run-length-missingness-gap-bridging.md)
 - 2026-10-07: [GCH overfitting, regularization, EMA, and sampling-length experiments](2026-10-07/regularization-ema-sampling-experiments.md)
 - 2026-10-06: [Why SMFNet predicts cell-type differences in pair correlations weakly](2026-10-06/covariation-differences-diagnostics.md)
