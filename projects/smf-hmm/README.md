@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-10-23: [HiddenFoot baseline: bugs, fixed reruns, and favorable-setting variants](2026-10-23/hiddenfoot-baseline-bugs-and-variants.md)
 - 2026-10-22: [Posterior predictive checks of the fixed-blocks SMF HMM](2026-10-22/posterior-predictive-checks.md)
 - 2026-09-28: [Chr16 covariation, ChIP width, and window-selection limits](2026-09-28/chr16-covariation-chip-width-and-window-selection.md)
 
