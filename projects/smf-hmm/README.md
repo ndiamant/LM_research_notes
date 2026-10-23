@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-10-22: [Posterior predictive checks of the fixed-blocks SMF HMM](2026-10-22/posterior-predictive-checks.md)
 - 2026-09-28: [Chr16 covariation, ChIP width, and window-selection limits](2026-09-28/chr16-covariation-chip-width-and-window-selection.md)
 
 - 2026-09-23: [Posterior-mean TF/ChIP evaluation and example plots](2026-09-23/posterior-mean-tf-chip-evaluation.md)
