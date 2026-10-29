@@ -229,6 +229,33 @@ AlphaGenome closes 71% of the gap between the baseline and ATAC using the
 summary values ((0.7601 − 0.7296) / (0.7723 − 0.7296)), or 79% using the paired
 per-region means (0.0293 / 0.0369).
 
+### Medians with the pseudo-replicate ceiling
+
+`metrics_summary.tsv` reports per-region **medians**, and its "floor" is the
+pseudo-replicate median. The paired differences above are **means**. That is
+why the gap closure is 71% from the summary values and 79% from the paired
+means.
+
+The table below gives medians over the 7,559 regions against the resampled
+baseline. The pseudo-replicate ceiling depends only on the data, so it is the
+same for all models. "% of gap" is the share of the distance from the baseline
+to the ceiling that each model closes. Script:
+[scripts/table_with_ceiling.py](frozen-alphagenome-encoder/scripts/table_with_ceiling.py).
+
+| metric | baseline | AlphaGenome | ATAC | pseudo-replicate | AG % of gap | ATAC % of gap |
+| --- | --- | --- | --- | --- | --- | --- |
+| `pearson_matched` | 0.730 | 0.760 | 0.772 | 0.818 | 35% | 48% |
+| `pearson_flank_residual_matched` | 0.702 | 0.736 | 0.747 | 0.803 | 34% | 44% |
+| `covariation_corr_of_corr_pearson` | 0.641 | 0.644 | 0.646 | 0.682 | 9% | 13% |
+| `covariation_residual_corr_of_corr_pearson` | 0.237 | 0.244 | 0.246 | 0.324 | 8% | 11% |
+| `run_length_zeros_wasserstein` (bp, lower better) | 3.31 | 3.16 | 3.11 | 2.74 | 27% | 35% |
+| `run_length_ones_wasserstein` (bp, lower better) | 7.10 | 7.19 | 7.43 | 4.57 | −4% | −13% |
+
+Both conditioning signals close a sizable share of the profile gap, but only
+about 10% of the covariation (corr-of-corr) gap, and both move away from the
+ceiling on ones run lengths. Inferred: they mainly improve where molecules are
+accessible, not how sites co-vary within a molecule.
+
 # Related Notes
 
 - [Flank baseline for profile metrics](../2026-10-05/flank-baseline-logistic-regression.md):
