@@ -1,0 +1,31 @@
+Summary (model value; fraction = share of the null-to-floor gap closed)
+                                baseline          alphagenome             atac         
+                                   model fraction       model fraction   model fraction
+metric                                                                                 
+pearson_matched                   0.7310   0.8878      0.7601   0.9254  0.7723   0.9412
+spearman_matched                  0.7087   0.8843      0.7359   0.9203  0.7471   0.9351
+pearson_flank_residual_matched    0.7022   0.8499      0.7362   0.9003  0.7466   0.9158
+spearman_flank_residual_matched   0.6760   0.8396      0.7090   0.8894  0.7200   0.9060
+run_length_zeros_wasserstein      3.3187   0.9566      3.1556   0.9690  3.1077   0.9725
+run_length_ones_wasserstein       7.0715   0.9044      7.1926   0.9000  7.4338   0.8909
+floor/null: {'pearson_matched': {'floor': 0.8178, 'null': 0.044}, 'spearman_matched': {'floor': 0.7962, 'null': 0.0407}, 'pearson_flank_residual_matched': {'floor': 0.8034, 'null': 0.1294}, 'spearman_flank_residual_matched': {'floor': 0.7823, 'null': 0.1195}, 'run_length_zeros_wasserstein': {'floor': 2.7365, 'null': 16.1451}, 'run_length_ones_wasserstein': {'floor': 4.5634, 'null': 30.8061}}
+
+Per-region paired differences vs baseline (mean, SE, median, share of regions better)
+      model                                    metric    n  mean_diff     se  median_diff  frac_better
+alphagenome                           pearson_matched 7559     0.0281 0.0016       0.0191       0.6075
+alphagenome            pearson_flank_residual_matched 7559     0.0293 0.0018       0.0198       0.6091
+alphagenome              run_length_zeros_wasserstein 7559    -0.3300 0.0288      -0.1693       0.5445
+alphagenome               run_length_ones_wasserstein 7559     0.1318 0.0320       0.0996       0.4838
+alphagenome          covariation_corr_of_corr_pearson 7559     0.0023 0.0005       0.0022       0.5190
+alphagenome covariation_residual_corr_of_corr_pearson 7559     0.0030 0.0011       0.0025       0.5116
+       atac                           pearson_matched 7559     0.0357 0.0017       0.0240       0.6232
+       atac            pearson_flank_residual_matched 7559     0.0388 0.0018       0.0259       0.6234
+       atac              run_length_zeros_wasserstein 7559    -0.4625 0.0319      -0.2338       0.5571
+       atac               run_length_ones_wasserstein 7559     0.3124 0.0335       0.3200       0.4478
+       atac          covariation_corr_of_corr_pearson 7559     0.0043 0.0005       0.0044       0.5408
+       atac covariation_residual_corr_of_corr_pearson 7559     0.0078 0.0011       0.0071       0.5306
+
+Pooled site correlations (model_all_reads):
+  baseline: pearson 0.8662, spearman 0.8210
+  alphagenome: pearson 0.9040, spearman 0.8623
+  atac: pearson 0.9113, spearman 0.8731

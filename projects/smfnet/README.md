@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-10-29: [Frozen AlphaGenome encoder as SMFNet's DNA encoder (ONT mESC), design and val results vs baseline and ATAC](2026-10-29/frozen-alphagenome-encoder.md)
 - 2026-10-14: [PRISM speedup from shared DNA encoding and skipped wildtype bases (commit 66d6585) on H100](2026-10-14/prism-speedup-benchmark-h100.md)
 - 2026-10-08: [Region count for the sampling-step appendix figure](2026-10-08/sampling-step-region-count.md)
 - 2026-10-08: [What ends observed SMF runs, and whether to bridge missing gaps in run-length metrics](2026-10-08/run-length-missingness-gap-bridging.md)
