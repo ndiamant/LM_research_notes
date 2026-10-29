@@ -20,8 +20,8 @@ convolutional encoder, **frozen**, plus a light trainable decoder to 1 bp, gives
 almost the same validation loss as the baseline (0.29373 vs 0.29436). But the
 sampled profiles are clearly better on the ONT mESC validation active regions:
 `pearson_matched` 0.760 vs 0.731, paired per-region difference +0.028 ± 0.002.
-That closes about 75% of the gap between the baseline and the ATAC-conditioned
-model (0.772), without any extra input. Training is also ~17% faster per step.
+That closes roughly 70–80% of the gap between the baseline and the
+ATAC-conditioned model (0.772), without any extra input. Training is also ~17% faster per step.
 Resampling the baseline with the current sampling code reproduced its old
 samples within noise, so the gain is not an artifact of the sampling code
 (update below). Remaining caveat: one seed per model.
@@ -224,8 +224,10 @@ with output in [compare_resampled.txt](frozen-alphagenome-encoder/compare_resamp
 | `run_length_zeros_wasserstein` | −0.31 ± 0.02 bp (55%) | −0.44 ± 0.03 bp (56%) |
 | `run_length_ones_wasserstein` | +0.12 ± 0.02 bp (47%) | +0.31 ± 0.02 bp (43%) |
 
-The resampled baseline's `pearson_matched` is 0.7296 (old samples: 0.7310), so
-AlphaGenome still closes ~78% of the gap between the baseline and ATAC.
+The resampled baseline's `pearson_matched` is 0.7296 (old samples: 0.7310).
+AlphaGenome closes 71% of the gap between the baseline and ATAC using the
+summary values ((0.7601 − 0.7296) / (0.7723 − 0.7296)), or 79% using the paired
+per-region means (0.0293 / 0.0369).
 
 # Related Notes
 
