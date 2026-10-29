@@ -22,8 +22,9 @@ sampled profiles are clearly better on the ONT mESC validation active regions:
 `pearson_matched` 0.760 vs 0.731, paired per-region difference +0.028 ± 0.002.
 That closes about 75% of the gap between the baseline and the ATAC-conditioned
 model (0.772), without any extra input. Training is also ~17% faster per step.
-Caveats: one seed per model, and the baseline samples came from older sampling
-code.
+Resampling the baseline with the current sampling code reproduced its old
+samples within noise, so the gain is not an artifact of the sampling code
+(update below). Remaining caveat: one seed per model.
 
 # Key Points
 
@@ -181,6 +182,7 @@ regions where the model is better):
 
 - One seed per model. The per-region SEs capture variation across regions, not
   across training runs.
+- (Resolved, see the update below.)
 - The baseline samples were produced by older sampling code (sample-file
   schema v1; the AlphaGenome and ATAC samples are v2). The samples themselves
   are unchanged; only a `data_config` attribute was added on 2026-10-27. A
@@ -190,6 +192,40 @@ regions where the model is better):
   prefix-stripped copy is at
   `SMFNet_full_run_2026-08-11/epoch=377-step=171990-converted.ckpt` and loads
   with `load_model`.
+
+## Update: baseline resampled with current code (2026-10-29)
+
+Job 50155720 (btrippe, 1x H100, COMPLETED in 1 h 38 m, MaxRSS 10 GB) ran
+[scripts/sample_metrics_baseline_val.sbatch](frozen-alphagenome-encoder/scripts/sample_metrics_baseline_val.sbatch):
+
+```bash
+sbatch $SCRATCH/smfnet_ag_smoke/sample_metrics_baseline_val.sbatch
+```
+
+It resampled the baseline (`epoch=377-step=171990-converted.ckpt`) on the same
+val active regions and settings as above, then ran metrics with plots. Outputs:
+`SMFNet_full_run_2026-08-11/samples_val_ac_epoch377_current_code` and
+`metrics_val_ac_epoch377_current_code_plots`. The comparison used
+[scripts/compare_resampled.py](frozen-alphagenome-encoder/scripts/compare_resampled.py),
+with output in [compare_resampled.txt](frozen-alphagenome-encoder/compare_resampled.txt).
+
+- **Old vs new baseline samples** agree within sampling noise (paired, mean ±
+  SE): `pearson_matched` +0.0012 ± 0.0012 (51% of regions), zeros run length
+  +0.02 ± 0.02 bp, ones run length −0.007 ± 0.03 bp, pooled site Pearson
+  0.86616 vs 0.86621.
+- **Against the resampled baseline**, the gains are unchanged:
+
+| metric | AlphaGenome | ATAC |
+| --- | --- | --- |
+| `pearson_matched` | +0.029 ± 0.001 (62%) | +0.037 ± 0.001 (64%) |
+| `pearson_flank_residual_matched` | +0.031 ± 0.001 (62%) | +0.040 ± 0.002 (65%) |
+| `covariation_corr_of_corr_pearson` | +0.003 ± 0.0004 (53%) | +0.005 ± 0.0004 (55%) |
+| `covariation_residual_corr_of_corr_pearson` | +0.005 ± 0.0007 (52%) | +0.010 ± 0.0008 (55%) |
+| `run_length_zeros_wasserstein` | −0.31 ± 0.02 bp (55%) | −0.44 ± 0.03 bp (56%) |
+| `run_length_ones_wasserstein` | +0.12 ± 0.02 bp (47%) | +0.31 ± 0.02 bp (43%) |
+
+The resampled baseline's `pearson_matched` is 0.7296 (old samples: 0.7310), so
+AlphaGenome still closes ~78% of the gap between the baseline and ATAC.
 
 # Related Notes
 
@@ -204,10 +240,8 @@ regions where the model is better):
 
 # Open Questions
 
-- Does the gain hold when the baseline is resampled with the current sampling
-  code? A ready job script is
-  [scripts/sample_baseline_val.sbatch](frozen-alphagenome-encoder/scripts/sample_baseline_val.sbatch)
-  (~1.5 h on an H100, not yet submitted).
+- (Resolved) Does the gain hold when the baseline is resampled with the
+  current sampling code? Yes; see the update below.
 - Are the AlphaGenome and ATAC gains additive? Train with both.
 - Does unfreezing after 1 epoch, or a trainable dilated body on top, improve
   further, or does it overfit?
