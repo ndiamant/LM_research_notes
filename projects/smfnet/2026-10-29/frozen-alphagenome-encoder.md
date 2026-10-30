@@ -256,6 +256,88 @@ about 10% of the covariation (corr-of-corr) gap, and both move away from the
 ceiling on ones run lengths. Inferred: they mainly improve where molecules are
 accessible, not how sites co-vary within a molecule.
 
+## Diagnostics: loss by mask rate, site type, and conditioning swap (2026-10-29)
+
+Script:
+[scripts/mask_rate_site_loss.py](frozen-alphagenome-encoder/scripts/mask_rate_site_loss.py).
+Runners: [run_all.sh](frozen-alphagenome-encoder/scripts/run_all.sh),
+[run_bg_rest.sh](frozen-alphagenome-encoder/scripts/run_bg_rest.sh) and
+[run_full_mask.sh](frozen-alphagenome-encoder/scripts/run_full_mask.sh).
+Summaries: [summary_rates.txt](frozen-alphagenome-encoder/diagnostics/summary_rates.txt)
+and [summary_full_mask.txt](frozen-alphagenome-encoder/diagnostics/summary_full_mask.txt),
+produced by [summarize.py](frozen-alphagenome-encoder/scripts/summarize.py)
+from the per-model JSON files in
+[diagnostics/](frozen-alphagenome-encoder/diagnostics/).
+
+The runs used Sherlock job 50179010 (1× H100) and the three epoch-377
+checkpoints. The baseline used the `-converted` copy. The ATAC model ran
+through a temporary `nd_atac` worktree at `$SCRATCH/src/SMFNet_atac`, with
+`PYTHONPATH=$SCRATCH/src/SMFNet_atac/src`, the pooled TKO ATAC bigWig, and its
+library size taken from the bigWig total.
+
+- **Data:** the val split, run separately on the active (7,559) and background
+  (6,363) region h5s, 32 reads per region. Read choice is deterministic per
+  region (seeded by index).
+- **Masks:** each call is hidden when a uniform draw (seeded by batch index,
+  identical across models) falls below the mask rate. Rates are 0.05–0.95 in
+  steps of 0.1, plus 0.99 and 1.0 (all calls hidden, where sampling starts).
+- **Metric:** cross-entropy per hidden call, under bf16 autocast, split into
+  CpG-only, GpC-only and GCG (both) sites by the cropped DNA.
+- **Swap control:** each rate is repeated with the conditioning (DNA, plus
+  ATAC for the ATAC model) rolled by one region within the batch.
+
+Change in cross-entropy from the baseline, active regions, all sites:
+
+| mask rate | 0.05 | 0.25 | 0.45 | 0.65 | 0.85 | 0.95 | 1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline (absolute) | 0.1797 | 0.2038 | 0.2379 | 0.2925 | 0.4048 | 0.5218 | 0.6144 |
+| AlphaGenome | −0.0002 | −0.0004 | −0.0007 | −0.0016 | −0.0031 | −0.0043 | −0.0046 |
+| ATAC | −0.0004 | −0.0007 | −0.0010 | −0.0016 | −0.0029 | −0.0042 | −0.0049 |
+
+Background regions, all sites:
+
+| mask rate | 0.05 | 0.25 | 0.45 | 0.65 | 0.85 | 0.95 | 1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline (absolute) | 0.2086 | 0.2332 | 0.2660 | 0.3183 | 0.4184 | 0.5179 | 0.5910 |
+| AlphaGenome | +0.0010 | +0.0011 | +0.0008 | +0.0005 | −0.0002 | −0.0006 | −0.0009 |
+| ATAC | +0.0002 | −0.0001 | −0.0003 | −0.0004 | −0.0007 | −0.0008 | −0.0008 |
+
+Findings:
+
+1. **The gain grows with mask rate.** When most of a read is visible, the
+   read predicts the hidden calls and the conditioning barely matters. This
+   confirms why val/loss, which averages over mask rates, hardly moved while
+   sampled profiles improved.
+2. **AlphaGenome ≈ ATAC on per-call loss** at every mask rate on active
+   regions (within 0.0003), although ATAC has the higher sampled profile
+   Pearson (0.772 vs 0.760). Possible reasons (speculative): profile Pearson
+   is scale-free and within-region, while cross-entropy also rewards each
+   region's overall level; or ATAC's advantage builds up over the iterative
+   sampling steps.
+3. **No CpG/GpC asymmetry.** On active regions with all calls hidden, CpG
+   (endogenous methylation, 20% of hidden calls) improves by −0.0050 and GpC
+   (70%) by −0.0043. The earlier guess that AlphaGenome would help less with
+   methylation was wrong.
+4. **Background regions: AlphaGenome is slightly worse at low mask rates**
+   (about +0.001 up to rate 0.35, on CpG and GpC alike), and better only from
+   rate 0.85 up. ATAC is roughly neutral. Swapping the DNA costs AlphaGenome
+   less than the baseline (+0.022 vs +0.025 with all calls hidden), so it
+   relies less on the DNA there. Speculative: the frozen features plus a small
+   decoder adapt less well to background context, which fine-tuning might fix.
+5. **Swap cost on active regions** with all calls hidden: baseline +0.098,
+   AlphaGenome +0.099, ATAC +0.107. AlphaGenome doesn't lean on the DNA more;
+   it uses it better.
+
+Caveats:
+
+- The differences are 0.001–0.005 nats against a total of 0.2–0.6.
+- No per-region standard errors were computed.
+- Consistency across mask rates is not independent evidence, since the rates
+  share data and nested masks.
+- An edit made during the first run crashed AlphaGenome's background-region
+  evaluation; it was rerun with the fixed script (`run_bg_rest.sh`). The
+  default-rate semantics are unchanged.
+
 # Related Notes
 
 - [Flank baseline for profile metrics](../2026-10-05/flank-baseline-logistic-regression.md):
@@ -274,11 +356,14 @@ accessible, not how sites co-vary within a molecule.
 - Are the AlphaGenome and ATAC gains additive? Train with both.
 - Does unfreezing after 1 epoch, or a trainable dilated body on top, improve
   further, or does it overfit?
-- Is the improvement concentrated at high mask rates, as inferred? Check with
-  `log_mask_rate_bins` or post hoc binned val loss.
-- Is it concentrated in the CpG (endogenous methylation) or GpC
-  (accessibility) channel? AlphaGenome likely has no methylation training
-  targets.
+- (Resolved) Is the improvement concentrated at high mask rates? Yes; see the
+  diagnostics below.
+- (Resolved) Is it concentrated in CpG or GpC sites? Neither: on active
+  regions CpG improves as much as GpC, or slightly more.
+- Why does AlphaGenome match ATAC on per-call loss but trail it on sampled
+  profile Pearson?
+- Why is the frozen AlphaGenome model slightly worse than the baseline on
+  background regions at low mask rates? Does partial fine-tuning fix it?
 - Why do ones run lengths get worse for both conditioned models?
 - Test-split results are reserved for the selected configuration.
 

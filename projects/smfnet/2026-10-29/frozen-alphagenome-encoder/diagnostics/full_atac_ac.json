@@ -1,0 +1,81 @@
+{
+ "checkpoint": "/scratch/users/diamant/smf_models/ONT_mESC_ATAC_TKO_pooled/epoch=377-step=171990.ckpt",
+ "h5": "/scratch/groups/btrippe/ndiamant/ONT_mESC_acRegions.h5",
+ "atac_bigwig": "/scratch/groups/btrippe/ndiamant/GSE184470_ESC_TKO_ATAC/tracks/ESC_TKO_pooled.tn5_counts.bw",
+ "n_regions": 7559,
+ "mask_rates": [
+  0.99,
+  1.0
+ ],
+ "sites": [
+  "cg_only",
+  "gc_only",
+  "gcg_both"
+ ],
+ "conditions": [
+  "own",
+  "rolled"
+ ],
+ "sums": [
+  [
+   [
+    [
+     1505377.6671179263,
+     2650115.0
+    ],
+    [
+     5536710.104263263,
+     9326032.0
+    ],
+    [
+     780138.2913561041,
+     1302990.0
+    ]
+   ],
+   [
+    [
+     1586881.9998114891,
+     2676971.0
+    ],
+    [
+     5759642.333364492,
+     9420264.0
+    ],
+    [
+     828977.8445442021,
+     1316128.0
+    ]
+   ]
+  ],
+  [
+   [
+    [
+     1810297.2669215691,
+     2650115.0
+    ],
+    [
+     6440789.9102664525,
+     9326032.0
+    ],
+    [
+     971063.0575813488,
+     1302990.0
+    ]
+   ],
+   [
+    [
+     1900609.8011812242,
+     2676971.0
+    ],
+    [
+     6680421.253286025,
+     9420264.0
+    ],
+    [
+     1027979.3852539584,
+     1316128.0
+    ]
+   ]
+  ]
+ ]
+}
