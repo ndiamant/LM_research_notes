@@ -5,9 +5,10 @@ project: smf-hmm
 agent: Claude Code
 status: draft
 sources:
-  - smf_hmm repo, evaluation/datasets/smf/kernel_denoise/ (README.md, make_widget.py, _template.html, fiberseq_kernel_denoise.html), branch nd/experiments, commits f20556f and 623ae24
+  - smf_hmm repo, evaluation/datasets/smf/kernel_denoise/ (README.md, make_widget.py, _template.html, fiberseq_kernel_denoise.html), branch nd/experiments, commits f20556f, 623ae24 and b3580ca
   - /scratch/groups/btrippe/ndiamant/fiberseq/GM12878/h5_ont_polarity/{active.h5,manifest.tsv}
   - /scratch/users/diamant/kernel_denoise_proto/ (proto.py, proto2.py, proto3.py, sweep.js, extract.js, core_test.js, cmp.py, dom_test.js, prof.js)
+  - smf_hmm repo, evaluation/datasets/smf/context_bias/adj_table_3_3.npz (commit d20f916), for the bias correction
   - smf_hmm repo, evaluation/datasets/smf/simple_HMM_tests/ (page style and call-raster rendering reused)
   - User discussion, 2026-10-30
 tags: [smf-hmm, fiberseq, m6a, gm12878, denoising, non-local-means, smoothing, thinning-evaluation, widget]
@@ -132,6 +133,39 @@ node dom_test.js <path>/fiberseq_kernel_denoise.html   # mock-DOM smoke test
 Profile and check the core through `extract.js` → `core_mod.js`. A direct `eval` of the
 script blocks V8 optimisation and inflated the timings about tenfold.
 
+## Correcting own-read smoothing for context bias (commit `b3580ca`)
+
+Added after the [context-bias experiment](fiberseq-m6a-sequence-context-bias.md).
+
+- **Efficiency per site.** `make_widget.py` looks up each site's 3+3 context in hg38,
+  reverse-complemented at T sites. It takes a relative efficiency `e` from the adjusted table
+  `adj_table_3_3.npz`: `sigmoid(f + g[top active bin])`, scaled to mean 1 over the payload.
+  The lookup matches the fit's own `ctx_id(3, 3)` encoding on 5000 chr21 sites.
+- **Bias-corrected RBF.** `â = Σ w·m6A / Σ w·e` estimates accessibility under
+  `P(m6A) = a · e(context)`. The ratio form avoids the variance blow-up of reweighting each call
+  by 1/e where e is about 0.002. Because the thinning target is a call, it is scored as `â · e`.
+
+Thinning at 0.5, bw 15 bp, 24 windows, mean AUROC:
+
+| score | all 24 | 3 windows on the table's held-out chromosomes |
+| --- | --- | --- |
+| `e` alone | 0.731 | 0.717 |
+| own-read RBF | 0.890 | 0.898 |
+| RBF × e (control) | 0.916 | 0.917 |
+| corrected RBF × e | 0.917 | 0.918 |
+
+- **Nearly all of the gain is the factor of `e`, not the correction.** Removed m6A sits mostly
+  at efficient sites. Corrected × e beats the RBF × e control on 24 of 24 windows, but by only
+  +0.001, so this AUROC barely measures accessibility quality.
+- **The correction does change the accessibility estimate.** Averaged over molecules, the
+  corrected curve's correlation with Gaussian-weighted local mean efficiency falls from 0.62
+  to 0.36, at every bw from 10 to 25. The remaining 0.36 may be real GC-accessibility
+  covariation, or under-correction by the adjusted table (unresolved).
+- **It is not leakage.** The table was fit on chromosomes containing 21 of the 24 windows, but
+  the 3 windows on held-out chr8 and chr9 match the full set.
+- **The page now has the RBF × e control** in its dot plot and all-regions table, so the
+  comparison is not misread.
+
 # Related Notes
 
 - [Fiber-seq GM12878 data preparation for SMFNet](../../smfnet/2026-10-05/fiberseq-gm12878-data-preparation.md):
@@ -142,7 +176,8 @@ script blocks V8 optimisation and inflated the timings about tenfold.
   is the same idea applied to denoisers.
 - [m6A sequence-context bias in GM12878 Fiber-seq](fiberseq-m6a-sequence-context-bias.md):
   Follow-up from the same day. It finds about a 100-fold context-dependent spread in the m6A
-  rate, which the flat P(m6A|acc) used by this kernel ignores.
+  rate, which the flat P(m6A|acc) used by this kernel ignores, and supplies the 3+3 table used
+  for the bias correction above.
 
 # Open Questions
 
@@ -152,11 +187,14 @@ script blocks V8 optimisation and inflated the timings about tenfold.
   rate before computing weights, without losing the AUROC gain over the column mean?
 - Would context-dependent emissions in the likelihood kernel change the ranking against
   own-read smoothing?
+- Is the bias-corrected accessibility closer to the truth? The call-level thinning AUROC cannot
+  tell. Block thinning, or flat protection at ChIP-supported motifs instead of sequence-driven
+  dips, could.
 
 # Sources
 
 - smf_hmm `evaluation/datasets/smf/kernel_denoise/` on branch `nd/experiments` (commits
-  `f20556f`, `623ae24`): `README.md`, `make_widget.py`, `_template.html`,
+  `f20556f`, `623ae24`, `b3580ca`): `README.md`, `make_widget.py`, `_template.html`,
   `fiberseq_kernel_denoise.html`.
 - `/scratch/groups/btrippe/ndiamant/fiberseq/GM12878/h5_ont_polarity/active.h5` and
   `manifest.tsv`.

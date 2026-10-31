@@ -5,7 +5,7 @@ project: smf-hmm
 agent: Claude Code
 status: draft
 sources:
-  - smf_hmm repo, evaluation/datasets/smf/context_bias/ (README.md, aggregate_sites.py, fit_context_tables.py, plot_context_bias.py, results.json, adj_table_3_3.npz, context_bias.png), branch nd/experiments, uncommitted at time of writing
+  - smf_hmm repo, evaluation/datasets/smf/context_bias/ (README.md, aggregate_sites.py, fit_context_tables.py, plot_context_bias.py, results.json, adj_table_3_3.npz, context_bias.png), branch nd/experiments, commit d20f916
   - /scratch/groups/btrippe/ndiamant/fiberseq/GM12878/h5_ont_polarity/{active.h5,background.h5,manifest.tsv}
   - /scratch/groups/btrippe/brian/projects/SMF/fiberseq/reference/hg38.fa (+ .fai)
   - /scratch/groups/btrippe/ndiamant/hg38-blacklist.v2.bed.gz
@@ -140,8 +140,8 @@ A separate check computed raw 3+3 rates for A and T sites straight from `sites.n
   strand-asymmetric. Fiber-seq is strand-symmetric, and this shows a backed-off table is
   tractable to ±5 with 162M sites.
 - [Cross-read kernel denoising of undermethylated Fiber-seq](fiberseq-cross-read-kernel-denoising.md):
-  Same-day experiment whose likelihood kernel assumed a flat P(m6A|acc). The 100-fold
-  context spread found here is a likely reason to revisit it.
+  Same-day experiment whose likelihood kernel assumed a flat P(m6A|acc). Its
+  "Correcting for context bias" section applies `adj_table_3_3.npz` to own-read smoothing.
 
 # Open Questions
 
@@ -154,7 +154,7 @@ A separate check computed raw 3+3 rates for A and T sites straight from `sites.n
 
 # Sources
 
-- smf_hmm `evaluation/datasets/smf/context_bias/` on branch `nd/experiments`, uncommitted:
+- smf_hmm `evaluation/datasets/smf/context_bias/` on branch `nd/experiments`, commit `d20f916`:
   `README.md`, `aggregate_sites.py`, `fit_context_tables.py`, `plot_context_bias.py`,
   `results.json`, `adj_table_3_3.npz`, `context_bias.png`.
 - `/scratch/groups/btrippe/ndiamant/fiberseq/GM12878/h5_ont_polarity/` (`active.h5`,
