@@ -338,6 +338,91 @@ Caveats:
   evaluation; it was rerun with the fixed script (`run_bg_rest.sh`). The
   default-rate semantics are unchanged.
 
+## Update: fine-tuning AlphaGenome's down blocks (2026-11-02)
+
+Code: SMFNet_public `nd_alpha_genome` commit fddb9c3. It adds
+`CNNConfig.alphagenome_trainable_blocks=N`, which trains the last N down
+blocks of an otherwise frozen encoder; the frozen stages still run without
+autograd. It also adds `SMFNetConfig.alphagenome_lr_mult`, an lr multiplier
+for the trainable pretrained weights, of which only conv kernels get weight
+decay.
+
+Step benchmark (full batch, bf16, compiled, H100;
+[scripts/bench_finetune.py](frozen-alphagenome-encoder/scripts/bench_finetune.py)):
+
+| variant | trainable | step | peak memory |
+| --- | --- | --- | --- |
+| baseline | 21.2M | 694 ms | 63.3 GiB |
+| frozen | 8.8M | 576 ms | 58.4 GiB |
+| last 3 blocks trained | 65.9M | 589 ms | 60.3 GiB |
+| all trained | 98.7M | 651 ms | 70.2 GiB |
+
+Full fine-tuning was cheaper than predicted, because most of AlphaGenome's
+parameters sit in the coarse, short-sequence stages.
+
+Runs: 400 epochs, otherwise identical to the frozen run, with
+`alphagenome_lr_mult=0.1` and `log_mask_rate_bins=true`. All best checkpoints
+are from epoch 377.
+
+- `ONT_mESC_alphagenome_ft3` (`alphagenome_trainable_blocks=3`, wandb
+  `o9mshs7z`) ran in Sherlock job 50721347.
+- `ONT_mESC_alphagenome_ftall_run2` (`alphagenome_frozen=false`, wandb run
+  `ONT_mESC_alphagenome_ftall_run2`) ran as job 50369879
+  ([train_alphagenome_ftall_run2.sbatch](frozen-alphagenome-encoder/scripts/train_alphagenome_ftall_run2.sbatch)).
+  The first attempt, job 50228093, died at epoch 17 when a DataLoader worker
+  segfaulted. That is intermittent and unrelated to the model; the rerun set
+  `PYTHONFAULTHANDLER=1` and did not crash.
+
+Evaluation:
+[scripts/eval_pipeline.sh](frozen-alphagenome-encoder/scripts/eval_pipeline.sh)
+ran sampling (val active regions, 1,024 reads, seed 0), metrics with plots,
+and the mask-rate diagnostics. The ftall evaluation ran as job 50739485. The
+comparison is in
+[compare_all.txt](frozen-alphagenome-encoder/compare_all.txt), from
+[scripts/compare_all.py](frozen-alphagenome-encoder/scripts/compare_all.py),
+with diagnostics in
+[summary_rates_5models.txt](frozen-alphagenome-encoder/diagnostics/summary_rates_5models.txt)
+and
+[summary_full_mask_5models.txt](frozen-alphagenome-encoder/diagnostics/summary_full_mask_5models.txt).
+
+| | baseline | AG frozen | AG last 3 | AG all | ATAC | pseudo-replicate |
+| --- | --- | --- | --- | --- | --- | --- |
+| best val/loss | 0.29436 | 0.29373 | 0.29393 | 0.29348 | 0.29328 | |
+| `pearson_matched` (median) | 0.730 | **0.760** | 0.751 | 0.756 | 0.772 | 0.818 |
+| `pearson_flank_residual_matched` | 0.702 | **0.736** | 0.724 | 0.732 | 0.747 | 0.803 |
+| corr-of-corr Pearson | 0.641 | 0.644 | 0.644 | 0.644 | 0.646 | 0.682 |
+| residual corr-of-corr Pearson | 0.237 | 0.244 | 0.246 | **0.249** | 0.246 | 0.324 |
+| zeros run length (bp) | 3.31 | **3.16** | 3.25 | 3.21 | 3.11 | 2.74 |
+| ones run length (bp) | 7.10 | 7.19 | 7.14 | 7.20 | 7.43 | 4.57 |
+
+Paired `pearson_matched` differences from the baseline (mean ± SE): frozen
++0.029 ± 0.001, last 3 +0.019 ± 0.001, all +0.023 ± 0.001, ATAC +0.037 ±
+0.001.
+
+Change in cross-entropy per hidden call from the baseline:
+
+| | AG frozen | AG last 3 | AG all | ATAC |
+| --- | --- | --- | --- | --- |
+| active, mask 0.05 | −0.0002 | −0.0006 | −0.0010 | −0.0004 |
+| active, all hidden | −0.0046 | −0.0032 | −0.0036 | −0.0049 |
+| background, mask 0.05 | +0.0010 | +0.0007 | +0.0002 | +0.0002 |
+| background, all hidden | −0.0009 | −0.0003 | −0.0003 | −0.0008 |
+
+Reading:
+
+- Fine-tuning shifts AlphaGenome's features toward prediction from read
+  context (low mask rates, including background regions, which fixes the
+  frozen model's low-mask penalty there) and away from DNA-only prediction
+  (high mask rates). That lowers val/loss slightly (full fine-tuning: 0.29348)
+  but makes sampled profiles worse than frozen.
+- This matches the genomicsxai post's finding that frozen encoders
+  generalize better than fine-tuned ones.
+- Training only the last 3 blocks is worse than training all of them, on
+  both val/loss and profiles.
+- Fine-tuning does improve residual corr-of-corr, matching ATAC.
+- Caveats: one seed each, and one lr multiplier (0.1) tried. A smaller
+  multiplier, or freezing for longer, might keep the high-mask gain.
+
 # Related Notes
 
 - [Flank baseline for profile metrics](../2026-10-05/flank-baseline-logistic-regression.md):
@@ -354,8 +439,10 @@ Caveats:
 - (Resolved) Does the gain hold when the baseline is resampled with the
   current sampling code? Yes; see the update below.
 - Are the AlphaGenome and ATAC gains additive? Train with both.
-- Does unfreezing after 1 epoch, or a trainable dilated body on top, improve
-  further, or does it overfit?
+- (Partly resolved) Does fine-tuning AlphaGenome help? It lowers val/loss
+  slightly but makes sampled profiles worse than frozen; see the fine-tuning
+  update below. Untested: a lower lr multiplier, or a trainable dilated body
+  on top of the frozen encoder.
 - (Resolved) Is the improvement concentrated at high mask rates? Yes; see the
   diagnostics below.
 - (Resolved) Is it concentrated in CpG or GpC sites? Neither: on active
@@ -363,7 +450,8 @@ Caveats:
 - Why does AlphaGenome match ATAC on per-call loss but trail it on sampled
   profile Pearson?
 - Why is the frozen AlphaGenome model slightly worse than the baseline on
-  background regions at low mask rates? Does partial fine-tuning fix it?
+  background regions at low mask rates? Full fine-tuning removes most of the
+  penalty, at the cost of the high-mask gain.
 - Why do ones run lengths get worse for both conditioned models?
 - Test-split results are reserved for the selected configuration.
 
