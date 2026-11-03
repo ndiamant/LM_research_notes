@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-02: [Single-TF emission head learns a CGC artifact, not enzyme bias or much TF identity](2026-11-02/single-tf-emission-head-learns-cgc-not-tf-identity.md)
 - 2026-10-30: [Fiber-seq HMM absorbs m6A context bias into its states and its DNA prior](2026-10-30/fiber-hmm-enzyme-bias-diagnostic.md)
 - 2026-10-30: [m6A sequence-context bias in GM12878 Fiber-seq](2026-10-30/fiberseq-m6a-sequence-context-bias.md)
 - 2026-10-30: [Cross-read kernel denoising of undermethylated Fiber-seq](2026-10-30/fiberseq-cross-read-kernel-denoising.md)
