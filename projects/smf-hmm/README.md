@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-03: [ChIP evaluation of single-TF models — multi-TF wins on OCT4 and KLF4 through its weak TF states and its prior](2026-11-03/chip-eval-single-tf-vs-multi-tf.md)
 - 2026-11-03: [Merged-CGC assay and 147 bp invaded-edge histone; TF now fills call-free stretches](2026-11-03/merged-cgc-147bp-histone-run.md)
 - 2026-11-02: [Single-TF emission head learns a CGC artifact, not enzyme bias or much TF identity](2026-11-02/single-tf-emission-head-learns-cgc-not-tf-identity.md)
 - 2026-10-30: [Fiber-seq HMM absorbs m6A context bias into its states and its DNA prior](2026-10-30/fiber-hmm-enzyme-bias-diagnostic.md)
