@@ -1,5 +1,5 @@
 ---
-title: ChIP evaluation of single-TF models — multi-TF wins on OCT4 through weak TF states that mostly track sequence-context bias
+title: ChIP evaluation of single-TF models — multi-TF wins on OCT4 through a weak-TF floor on accessible reads
 date: 2026-11-03
 project: smf-hmm
 agent: Claude Code
@@ -34,6 +34,13 @@ merged-CGC / 147 bp run is no better than plain `single_tf`.
 - **The sequence prior.** Before any reads are seen, prior-only P(TF) at OCT4 motifs correlates
   with ChIP at 0.39–0.43 for multi-TF, vs 0.20–0.27 for single-TF. The reads then raise every
   model by about the same amount.
+
+**Clarification (2026-11-04).** `neural_global` does detect real OCT4 footprint reads
+(protected motif, accessible flanks; motif P(TF) 0.67–0.82 at the example site). It is the
+weak-TF floor on fully accessible reads that drives its site-level ChIP correlation. A
+learned context-offset table did not remove that floor, so the context-bias explanation
+below is not supported. See [controlled ChIP metrics and context
+offsets](../2026-11-04/controlled-chip-metrics-and-context-offsets.md).
 
 **Revision (later on 2026-11-03; details under "Read-level and context follow-up").**
 `neural_global` did learn the OCT4 motif, but mostly as a **sequence-context pattern**, not
