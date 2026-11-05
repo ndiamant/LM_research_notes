@@ -1,12 +1,12 @@
 ---
-title: Accessibility-controlled ChIP metrics, and a learned context-offset table that does not remove the OCT4 weak-TF floor
+title: Accessibility-controlled ChIP metrics; the OCT4 weak-TF floor comes from the occupancy KL target, not context bias
 date: 2026-11-04
 project: smf-hmm
 agent: Claude Code
 status: draft
 sources:
-  - /scratch/users/diamant/mesc_validation/covariation_windows/{chr8,chr16}-512-valid90-reads10/analysis_2026-11-04 and analysis_2026-11-04_context3 (individual_correlations.tsv, unique_motif_summaries.tsv.gz, motif_call_diagnostics/)
-  - Runs /scratch/users/diamant/2026-11-03_fixed_blocks_global_kl3_{context3,rerun} (wandb 3727hyo4, 19wq03el); /scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets (training)
+  - /scratch/users/diamant/mesc_validation/covariation_windows/{chr8,chr16}-512-valid90-reads10/analysis_2026-11-04, analysis_2026-11-04_context3 and analysis_2026-11-04_map_targets (individual_correlations.tsv, unique_motif_summaries.tsv.gz, motif_call_diagnostics/)
+  - Runs /scratch/users/diamant/2026-11-03_fixed_blocks_global_kl3_{context3,rerun} (wandb 3727hyo4, 19wq03el); /scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets (wandb 8cz8h7q6)
   - smf_hmm repo, branch nd/experiments, commits d160bfc, 8626d7f, 4436579, 53b9552, 61f2e83
   - User discussion, 2026-11-03 and 2026-11-04
 tags: [smf-hmm, tf-chip, benchmark, metrics, accessibility, prior-only, context-bias, emissions, oct4, ctcf, klf4, prior-occupancy-kl, weak-tf]
@@ -36,8 +36,27 @@ logit-offset table, plus a control retrain with no table.
   reads).
 - The learned table has no special offset at OCT4 motif calls.
 
-So the context-bias explanation of the floor is not supported. The revised hypothesis is the
-prior-occupancy KL target. A run with KL targets set to the MAP group occupancy is training.
+So the context-bias explanation of the floor is not supported.
+
+**MAP-target experiment: the occupancy KL target is the cause.** We retrained `neural_global`
+with prior-occupancy KL targets set to the control model's MAP group occupancy. Total TF went
+from 0.06 to 0.020; everything else was unchanged.
+- **The floor disappears.** The Q4 contribution of all-accessible reads to OCT4 site-mean P(TF)
+  falls from 0.063 / 0.092 (chr8 / chr16) to 0.002 / 0.002.
+- **Footprints are kept.** Reads protected at the motif keep their P(TF), for OCT4 and for CTCF.
+- **Likelihood is slightly better:** validation NLL 12.351 vs 12.356 per read.
+- **The weak TF groups leave their floor:** `TF_short_weak` 0.51 and `TF_long_weak` 0.74
+  P(protected), previously pinned at 0.2.
+- **ChIP agreement:**
+  - CTCF is unchanged.
+  - OCT4 falls to single-TF's level: raw 0.48 / 0.57 → 0.22 / 0.23; partial given
+    accessibility 0.31 / 0.41 → 0.15 / 0.20.
+  - ESRRB falls to about 0 (0.28 / 0.30 → 0.00 / 0.01).
+  - KLF4 falls from 0.24 / 0.20 to 0.15 / 0.11.
+
+The multi-TF model's OCT4/ESRRB/KLF4 advantage was therefore produced by a KL target about 3.5
+times the TF rate the reads support. That target pushed the sequence prior to spread weak-TF
+mass over motifs in accessible DNA.
 
 # Key Points
 
@@ -150,15 +169,68 @@ the analysis scores them like any other model.
   hard-path summary that undercounts diffuse states, so it is a lower bound on what the data
   supports.
 
-**Running experiment.** `2026-11-04_fixed_blocks_global_kl3_map_targets` sets the KL targets
-to the control's MAP occupancy: [open, TF_short_strong, TF_short_weak, TF_long_strong,
-TF_long_weak, other_long, histone] = [0.3833, 0.007, 0.0001, 0.0127, 0.0005, 0.102, 0.4944].
-Targets must sum to 1. Everything else is identical to the control.
+**MAP-target experiment** (`2026-11-04_fixed_blocks_global_kl3_map_targets`).
 
-Predictions if the KL hypothesis holds:
-- the OCT4 floor drops;
-- footprint reads and CTCF keep their P(TF);
-- OCT4's raw Spearman falls, while its partial Spearman given accessibility holds up.
+Setup:
+- KL targets are the control's MAP occupancy: [open, TF_short_strong, TF_short_weak,
+  TF_long_strong, TF_long_weak, other_long, histone] = [0.3833, 0.007, 0.0001, 0.0127, 0.0005,
+  0.102, 0.4944]. Targets must sum to 1.
+- KL weight 3; everything else identical to the control.
+- Trained 100 epochs. Validation NLL 12.351 (control 12.356); prior-occupancy KL 0.007.
+- Learned P(protected): TF_short_weak 0.51, TF_long_weak 0.74. Strong groups, other_long and
+  histone stay at 0.99; open at 0.01.
+
+Predictions made before the result:
+1. the OCT4 floor drops;
+2. footprint reads and CTCF keep their P(TF);
+3. OCT4's raw Spearman falls, while its partial Spearman given accessibility holds up.
+
+Predictions 1 and 2 held. Prediction 3 held only in part: the partial Spearman fell too. So
+the floor carried motif-prior information beyond accessibility as well.
+
+- **Contribution to site-mean motif P(TF) by read category**, low → high ChIP quartile,
+  chr8 / chr16:
+
+| | control | MAP targets |
+|---|---|---|
+| OCT4, all-accessible reads | 0.021→0.063 / 0.021→0.092 | **0.001→0.002 / 0.002→0.002** |
+| OCT4, no motif call | 0.023→0.055 / 0.019→0.051 | 0.005→0.008 / 0.005→0.007 |
+| OCT4, protected motif call | 0.016→0.030 / 0.016→0.034 | 0.015→0.028 / 0.015→0.031 |
+| CTCF, protected motif call | 0.023→0.521 / 0.024→0.525 | 0.021→0.524 / 0.021→0.527 |
+
+- **ChIP agreement**, chr8 / chr16:
+
+| | CTCF | ESRRB | KLF4 | OCT4 |
+|---|---|---|---|---|
+| **raw Spearman** | | | | |
+| control (`neural_global_rerun`) | 0.66 / 0.68 | 0.28 / 0.30 | 0.24 / 0.20 | 0.48 / 0.57 |
+| MAP targets | 0.65 / 0.66 | −0.00 / 0.01 | 0.15 / 0.11 | 0.22 / 0.23 |
+| MAP targets, prior only | 0.69 / 0.68 | −0.07 / −0.11 | 0.18 / 0.15 | 0.22 / 0.21 |
+| single_tf | 0.64 / 0.67 | 0.27 / 0.30 | 0.13 / 0.11 | 0.34 / 0.41 |
+| **partial Spearman, given accessibility** | | | | |
+| control | 0.63 / 0.65 | 0.16 / 0.16 | 0.02 / 0.04 | 0.31 / 0.41 |
+| MAP targets | 0.64 / 0.65 | −0.05 / −0.05 | 0.01 / 0.02 | 0.15 / 0.20 |
+| single_tf | 0.62 / 0.65 | 0.16 / 0.18 | −0.01 / 0.01 | 0.14 / 0.22 |
+| motif score (reference) | 0.53 / 0.52 | 0.26 / 0.28 | 0.17 / 0.17 | 0.28 / 0.41 |
+
+**Interpretation:**
+- With a TF target near what the reads support, P(TF) means footprint evidence: high on reads
+  protected at the motif, near zero otherwise.
+- The ChIP benchmark then credits only CTCF strongly, plus a residual OCT4 signal (partial
+  0.15–0.20). That residual fits the small binding-specific OCT4 footprint (about +0.02–0.03
+  over context) measured in the [ChIP evaluation
+  note](../2026-11-03/chip-eval-single-tf-vs-multi-tf.md).
+- ESRRB and KLF4 have no detectable footprint here. Their earlier correlations came from the
+  prior's motif-plus-accessibility placement.
+- **The trade-off is a modelling choice.**
+  - If P(TF) should be footprint evidence, the MAP-target model is the honest one, and it
+    fits the reads at least as well. The benchmark should then be read through partial or
+    posterior-minus-prior metrics.
+  - If P(TF) should be binding probability, it has to come from sequence plus accessibility.
+    That is better modelled explicitly than through an occupancy target.
+- **Caveat:** MAP undercounts diffuse states, so the MAP-rate targets are a lower bound. An
+  intermediate target, e.g. halfway between the MAP rates and 0.015 per TF group, would show
+  how gradual the trade-off is. Not yet run (user asked to hold).
 
 # Commands
 
@@ -184,7 +256,20 @@ for CHR in chr8 chr16; do D=$M/$CHR-512-valid90-reads10; P=$D/posteriors
   $PY -m evaluation.tf_chip.motif_call_diagnostics $D/dataset.h5 $D/analysis_2026-11-04_context3 \
     --model neural_global_rerun --model neural_global_context3
 done
-bash /scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets/train.sh   # MAP-target run (in progress)
+bash /scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets/train.sh   # MAP-target training, job 50835752
+# The allocation ended after training finished; the rest ran in Slurm job 51132065 (sh04-06n09, 1 L40S).
+bash $M/infer_map_targets_2026-11-04.sh                                               # posteriors + prior-only, chr8 and chr16
+for CHR in chr8 chr16; do D=$M/$CHR-512-valid90-reads10; P=$D/posteriors
+  $PY -m evaluation.tf_chip.analyze_covariation $D/dataset.h5 \
+    --prediction neural_global=$P/neural_global.h5 --prediction neural_global_prior=$P/neural_global_prior.h5 \
+    --prediction neural_global_rerun=$P/neural_global_rerun.h5 --prediction neural_global_rerun_prior=$P/neural_global_rerun_prior.h5 \
+    --prediction neural_global_context3=$P/neural_global_context3.h5 \
+    --prediction neural_global_map_targets=$P/neural_global_map_targets.h5 --prediction neural_global_map_targets_prior=$P/neural_global_map_targets_prior.h5 \
+    --prediction single_tf=$P/single_tf.h5 \
+    --output-dir $D/analysis_2026-11-04_map_targets
+  $PY -m evaluation.tf_chip.motif_call_diagnostics $D/dataset.h5 $D/analysis_2026-11-04_map_targets \
+    --model neural_global_rerun --model neural_global_map_targets
+done
 ```
 
 - One-off snippets, not saved scripts:
@@ -201,9 +286,11 @@ bash /scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets/train
 
 # Open Questions
 
-- Does the MAP-target run remove the OCT4 floor, and what happens to CTCF and the footprint
-  reads?
-- If the floor stays, what drives the prior's weak-TF placement at motifs?
+- How gradual is the trade-off between the original targets and the MAP-rate targets? An
+  intermediate run would answer this.
+- Should binding probability (sequence plus accessibility) be modelled explicitly, separately
+  from footprint evidence?
+- In the MAP-target model, how are MAP and posterior-marginal TF occupancy now related?
 - For CTCF, reads add only 0.01–0.02 over the prior in site ranking. Do they matter more for
   per-molecule calls, which ChIP cannot score?
 - Should the ChIP benchmark's headline metric be the partial Spearman given accessibility, or
@@ -211,7 +298,7 @@ bash /scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets/train
 
 # Sources
 
-- Analyses: `/scratch/users/diamant/mesc_validation/covariation_windows/{chr8,chr16}-512-valid90-reads10/analysis_2026-11-04{,_context3}/`
-- Posteriors: `.../posteriors/{neural_global,single_tf,single_tf_147_merged_cgc,neural_global_rerun,neural_global_context3}_prior.h5`, `neural_global_{rerun,context3}.h5`
+- Analyses: `/scratch/users/diamant/mesc_validation/covariation_windows/{chr8,chr16}-512-valid90-reads10/analysis_2026-11-04{,_context3,_map_targets}/`
+- Posteriors: `.../posteriors/{neural_global,single_tf,single_tf_147_merged_cgc,neural_global_rerun,neural_global_context3,neural_global_map_targets}_prior.h5`, `neural_global_{rerun,context3,map_targets}.h5`
 - Runs: `/scratch/users/diamant/2026-11-03_fixed_blocks_global_kl3_{context3,rerun}`, `/scratch/users/diamant/2026-11-04_fixed_blocks_global_kl3_map_targets`
 - smf_hmm `nd/experiments`: `d160bfc` (context offsets), `8626d7f` (prior-only), `4436579` (example plots), `53b9552` (controlled metrics), `61f2e83` (diagnostics)
