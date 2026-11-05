@@ -1,6 +1,8 @@
 # SMF HMM
 
 ## Notes
+
+- 2026-11-05: [More ChIP-nexus TFs (MAX::MYC, NF-Y, ZFP281) — none footprints like CTCF; NF-Y has a small narrow footprint](2026-11-05/chip-nexus-tfs-max-myc-nfy-zfp281.md)
 - 2026-11-05: [A protected-read ChIP metric — model differences vanish on reads with protection at the motif](2026-11-05/protected-read-chip-metric.md)
 - 2026-11-04: [Accessibility-controlled ChIP metrics; the OCT4 weak-TF floor comes from the occupancy KL target, not context bias](2026-11-04/controlled-chip-metrics-and-context-offsets.md)
 - 2026-11-03: [ChIP evaluation of single-TF models — multi-TF wins on OCT4 through a weak-TF floor on accessible reads](2026-11-03/chip-eval-single-tf-vs-multi-tf.md)
