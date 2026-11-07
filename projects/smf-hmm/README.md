@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-06: [No evidence of TF dissociation in partially protected motifs; CTCF partial protection is site-fixed, OCT4/NF-Y lack the calls](2026-11-06/partial-motif-protection-and-dissociation.md)
 - 2026-11-06: [A frozen AlphaGenome encoder prior improves likelihood and the sequence prior, but not posterior ChIP agreement](2026-11-06/alphagenome-encoder-prior.md)
 - 2026-11-05: [More ChIP-nexus TFs (MAX::MYC, NF-Y, ZFP281) — none footprints like CTCF; NF-Y has a small narrow footprint](2026-11-05/chip-nexus-tfs-max-myc-nfy-zfp281.md)
 - 2026-11-05: [A protected-read ChIP metric — model differences vanish on reads with protection at the motif](2026-11-05/protected-read-chip-metric.md)

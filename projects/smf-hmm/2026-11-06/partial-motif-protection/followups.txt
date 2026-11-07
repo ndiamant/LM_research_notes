@@ -1,0 +1,40 @@
+1. CTCF mixture fits, top-ChIP-quartile non-nucleosomal reads
+  n=3 obs=[1413, 408, 484, 1258] bg + bound Binomial: fit=[1459, 224, 755, 1125] weights=[0.43, 0.57] q=0.82 NLL=4591.7
+  n=3 obs=[1413, 408, 484, 1258] bg + bound Binomial + partial(uniform): fit=[1413, 408, 484, 1258] weights=[0.31, 0.28, 0.4] q=0.96 NLL=4466.9
+  n=4 obs=[298, 36, 38, 32, 105] bg + bound Binomial: fit=[307, 11, 37, 83, 71] weights=[0.61, 0.39] q=0.77 NLL=653.0
+  n=4 obs=[298, 36, 38, 32, 105] bg + bound Binomial + partial(uniform): fit=[298, 37, 34, 34, 105] weights=[0.53, 0.14, 0.33] q=1.00 NLL=608.1
+
+2. Orientation consistency, CTCF 2-call motifs, reads with exactly 1 of 2 protected
+  Q4: sites=92 median dominant share=1.00 share>=0.9=0.86 null median=0.57
+  Q1-3: sites=25 median dominant share=1.00 share>=0.9=0.84 null median=0.67
+  dominant protected motif position (Q4): {1: 22, 4: 19, 0: 14, 5: 11, 12: 9, 11: 7, 14: 4, 2: 4}
+
+3./4. Widened motif windows and callable sites
+               sites  sites_2calls  reads  mixed  all_prot  mixed_frac  all_prot_frac
+tf   ext q                                                                           
+ctcf 0   Q1-3   2819          1627  22334   1465       855       0.066          0.038
+         Q4      945           585  12946   2987      5404       0.231          0.417
+     3   Q1-3   2795          2025  25944   2257      1196       0.087          0.046
+         Q4      945           715  18920   5283      8309       0.279          0.439
+     5   Q1-3   2777          2190  26794   2792      1252       0.104          0.047
+         Q4      941           768  21884   7455      8939       0.341          0.408
+nfy  0   Q1-3    480             5    107     22         2       0.206          0.019
+         Q4      161             4     77      1         1       0.013          0.013
+     3   Q1-3    475            96   1269     87        35       0.069          0.028
+         Q4      161            52   1511    109        69       0.072          0.046
+     5   Q1-3    472           150   1871    145        58       0.077          0.031
+         Q4      160            86   2352    171       104       0.073          0.044
+oct4 0   Q1-3    606            69    469     27        20       0.058          0.043
+         Q4      202            21    264     17        12       0.064          0.045
+     3   Q1-3    599           187   1307     98        39       0.075          0.030
+         Q4      200            73    921     70        42       0.076          0.046
+     5   Q1-3    596           253   1768    134        45       0.076          0.025
+         Q4      199           103   1304    103        53       0.079          0.041
+          smf_median  smf_mean  smf_ge2  m6a_median  m6a_mean
+tf   ext                                                     
+ctcf 0           2.0      1.77     0.59         5.0      4.59
+     5           3.0      2.68     0.80         9.0      8.97
+nfy  0           0.0      0.33     0.01         4.0      4.11
+     5           1.0      1.26     0.37         9.0      9.10
+oct4 0           1.0      0.74     0.11        11.0     10.45
+     5           1.0      1.44     0.45        16.0     15.65
