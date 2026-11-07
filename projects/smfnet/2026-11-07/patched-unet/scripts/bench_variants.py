@@ -1,0 +1,54 @@
+"""Training-step time (get_loss, backward, clip, AdamW; compiled, bf16) and peak
+memory of U-Net variants. Usage: bench_variants.py <variant> [smf_length regions]
+(default 1024 bp x 256 regions; 32 reads per region)."""
+import sys, time
+from types import SimpleNamespace
+import torch
+from smf_net.cnn import CNNConfig
+from smf_net.data import SMFItem
+from smf_net.model import SMFNet, SMFNetConfig
+
+FAST = dict(dna_encoder_type="alphagenome", smf_body_type="unet", unet_attention_layers=2,
+            unet_cross_attention=True, unet_channels_last=True, output_conv_matmul=True)
+READ = dict(unet_norm="read", unet_fused_norm=True)
+POS = dict(unet_norm="position")
+VARIANTS = {
+    "base": dict(**READ),
+    "base_pos": dict(**POS),
+    "p2": dict(**READ, unet_patch_size=2, unet_channels=[64, 80, 96, 112, 128, 144]),
+    "p4_narrow": dict(**READ, unet_patch_size=4, unet_channels=[80, 96, 112, 128, 144]),
+    "p4_mid": dict(**READ, unet_patch_size=4, unet_channels=[96, 128, 160, 192, 224]),
+    "p4_wide": dict(**READ, unet_patch_size=4, unet_channels=[128, 160, 192, 224, 256]),
+    "p4_wide_pos": dict(**POS, unet_patch_size=4, unet_channels=[128, 160, 192, 224, 256]),
+    "p4_wide_h2": dict(**READ, unet_patch_size=4, unet_channels=[128, 160, 192, 224, 256],
+                       unet_head_channels=32, unet_head_blocks=2),
+    "p4_mid_pos": dict(**POS, unet_patch_size=4, unet_channels=[96, 128, 160, 192, 224]),
+}
+name = sys.argv[1]
+smf_len = int(sys.argv[2]) if len(sys.argv) > 2 else 1024
+B = int(sys.argv[3]) if len(sys.argv) > 3 else 256
+R, L = 32, 2 * smf_len
+torch.backends.cudnn.benchmark = True
+cfg = CNNConfig(**FAST, **VARIANTS[name])
+model = SMFNet(SMFNetConfig(cnn_config=cfg, input_length=L)).cuda()
+model.smart_log = lambda *a, **k: None
+model._trainer = SimpleNamespace(max_epochs=400, estimated_stepping_batches=182000)
+opt = model.configure_optimizers()["optimizer"]
+model.model.compile()
+body = sum(p.numel() for n, p in model.model.named_parameters() if not n.startswith("dna_encoder"))
+g = torch.Generator().manual_seed(0)
+batch = SMFItem(smf=torch.randint(-1, 2, (B, R, L), generator=g).cuda(),
+                dna=torch.nn.functional.one_hot(torch.randint(4, (B, L), generator=g), 4).transpose(1, 2).float().cuda())
+def step():
+    with torch.autocast("cuda", dtype=torch.bfloat16):
+        loss = model.get_loss(batch, "train")
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    opt.step(); opt.zero_grad(set_to_none=True)
+for _ in range(5): step()
+torch.cuda.synchronize(); torch.cuda.reset_peak_memory_stats()
+t = time.time()
+for _ in range(30): step()
+torch.cuda.synchronize()
+print(f"RESULT {name:12s} smf {smf_len:5d} bp x {B:3d} regions: {(time.time() - t) / 30 * 1e3:6.1f} ms/step, "
+      f"peak {torch.cuda.max_memory_allocated() / 2**30:5.1f} GiB, non-DNA-encoder params {body / 1e6:.2f}M", flush=True)
