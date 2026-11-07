@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-06: [Attention U-Net training step 292 → 184 ms with a fused Triton norm kernel, channels-last activations and a Toeplitz output conv (H100)](2026-11-06/unet-training-speed.md)
 - 2026-11-03: [U-Net SMF body with AlphaGenome-style blocks and per-level FiLM from frozen AlphaGenome features](2026-11-03/unet-smf-body.md)
 - 2026-11-03: [Cheri blocks and Muon in SMFNet, the fused Triton kernel on PyTorch 2.5, memory, and Muon learning rate](2026-11-03/cheri-muon-smfnet.md)
 - 2026-10-29: [Frozen AlphaGenome encoder as SMFNet's DNA encoder (ONT mESC), design and val results vs baseline and ATAC](2026-10-29/frozen-alphagenome-encoder.md)
