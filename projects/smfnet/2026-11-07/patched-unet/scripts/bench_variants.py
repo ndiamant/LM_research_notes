@@ -1,6 +1,6 @@
 """Training-step time (get_loss, backward, clip, AdamW; compiled, bf16) and peak
-memory of U-Net variants. Usage: bench_variants.py <variant> [smf_length regions]
-(default 1024 bp x 256 regions; 32 reads per region)."""
+memory of U-Net variants. Usage: bench_variants.py <variant> [smf_length regions reads]
+(default 1024 bp x 256 regions x 32 reads per region)."""
 import sys, time
 from types import SimpleNamespace
 import torch
@@ -27,7 +27,8 @@ VARIANTS = {
 name = sys.argv[1]
 smf_len = int(sys.argv[2]) if len(sys.argv) > 2 else 1024
 B = int(sys.argv[3]) if len(sys.argv) > 3 else 256
-R, L = 32, 2 * smf_len
+R = int(sys.argv[4]) if len(sys.argv) > 4 else 32
+L = 2 * smf_len
 torch.backends.cudnn.benchmark = True
 cfg = CNNConfig(**FAST, **VARIANTS[name])
 model = SMFNet(SMFNetConfig(cnn_config=cfg, input_length=L)).cuda()
@@ -50,5 +51,7 @@ torch.cuda.synchronize(); torch.cuda.reset_peak_memory_stats()
 t = time.time()
 for _ in range(30): step()
 torch.cuda.synchronize()
-print(f"RESULT {name:12s} smf {smf_len:5d} bp x {B:3d} regions: {(time.time() - t) / 30 * 1e3:6.1f} ms/step, "
+ms = (time.time() - t) / 30 * 1e3
+print(f"RESULT {name:12s} smf {smf_len:5d} bp x {B:3d} regions x {R:3d} reads: {ms:6.1f} ms/step, "
+      f"{B * R / ms:5.1f}k reads/s, "
       f"peak {torch.cuda.max_memory_allocated() / 2**30:5.1f} GiB, non-DNA-encoder params {body / 1e6:.2f}M", flush=True)

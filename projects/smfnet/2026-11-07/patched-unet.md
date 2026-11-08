@@ -213,6 +213,38 @@ python3 patched-unet/scripts/compare_curves.py; python3 patched-unet/scripts/com
   all finished before it ended. The evaluation, h2 and the EMA timing ran in
   job 51468982.
 
+## Batch shape: regions × reads per region
+
+- **Benchmark** (`bench_variants.py <variant> 1024 <regions> <reads>`):
+  - More regions per batch doesn't raise throughput: 512 × 32 is only 3%
+    faster per read than 256 × 32, because the GPU is already saturated.
+  - More reads per region shares the per-region work across more reads
+    (AlphaGenome encoder, FiLM projections, cross-attention keys and values).
+    For p4_wide_h2, reads per second rise 54k → 61k at 128 × 64, 65k at
+    64 × 128 and 67k at 128 × 128. The 1 bp model gains about the same
+    (+12% to +22%).
+- **Data.** Training regions have 138 reads (median; 5–95%: 111–171), so
+  an epoch at 32 reads sees ~23% of the reads. At 128 reads per region, 25%
+  of regions would have to repeat reads.
+- **Matched test.** p4_wide_h2 at 128 regions × 64 reads, with
+  `trainer.max_epochs=200 model.cfg.warmup_epochs=5`, stopped after 15
+  epochs. That gives the same steps (13,650), reads per step, warmup length
+  in steps and LR schedule as the 256 × 32 run's first 30 epochs.
+  `warmup_epochs` is a new `SMFNetConfig` option (commit 05f0aea); its
+  default keeps the old rule.
+
+  | batch | real step | train s/epoch | fixed-mask val loss (32 reads/region) at step 13,650 |
+  | --- | --- | --- | --- |
+  | 256 × 32 | 163 ms* | 85* (455 steps) | 0.29861 |
+  | 128 × 64 | 149 ms | 150 (910 steps) | 0.29868 |
+
+  \* With the foreach EMA, measured in the 3-epoch timing run.
+
+  The two are equal at this point in training, and 128 × 64 is ~9% faster
+  in real training. The in-training val loss of the 128 × 64 run uses 64
+  reads per region, so it is not comparable to the other runs; hence the
+  rescoring (`run_r64.sh`).
+
 # Related Notes
 
 - [Training-step speed optimizations](../2026-11-06/unet-training-speed.md):
