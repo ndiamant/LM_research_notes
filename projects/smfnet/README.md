@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-08: [Do SMFNet models memorize training regions' DNA? Train vs val loss by mask rate, with own, wrong and mutated DNA](2026-11-08/memorization.md)
 - 2026-11-07: [Patched U-Net (4 bp patches, 1 bp head) matches the attention U-Net early in training at 0.6-0.8x the step and 0.7x the memory; Muon+EMA vs AdamW+EMA final results](2026-11-07/patched-unet.md)
 - 2026-11-06: [Attention U-Net training step 292 → 184 ms with a fused Triton norm kernel, channels-last activations and a Toeplitz output conv (H100)](2026-11-06/unet-training-speed.md)
 - 2026-11-03: [U-Net SMF body with AlphaGenome-style blocks and per-level FiLM from frozen AlphaGenome features](2026-11-03/unet-smf-body.md)
