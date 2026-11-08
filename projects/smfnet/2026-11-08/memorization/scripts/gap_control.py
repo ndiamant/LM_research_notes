@@ -7,7 +7,7 @@ def x(name, split):
     a = sum(np.array(json.load(open(f"{O}/{name}_{k}_{split}.json"))["sums"]) for k in ("ac", "bg"))
     return a[..., 0].sum(-1) / a[..., 1].sum(-1)
 rates = json.load(open(f"{O}/baseline_ac_train.json"))["mask_rates"]
-models = ["baseline", "ag_frozen", "ag_ftall", "attn_muon_ema", "atac"]
+models = ["baseline", "ag_frozen", "ag_ftall", "attn_muon_ema", "p4_muon_ema", "atac"]
 print("val - train, own DNA / rolled DNA")
 print("mask  " + "  ".join(f"{m:>17s}" for m in models))
 for i, r in enumerate(rates):

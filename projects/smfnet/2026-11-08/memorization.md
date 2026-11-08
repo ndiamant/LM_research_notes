@@ -199,8 +199,11 @@ $PIXI python summarize.py; $PIXI python gap_control.py
   mutation or dropout augmentation, or freezing.
 - **Would frozen AlphaGenome + ATAC keep ATAC's sampled-profile gains
   without the memorization?**
-- **The patched Muon+EMA run** should be added to this comparison when it
-  finishes.
+- **Added 2026-11-08: the patched Muon+EMA run.** Own/rolled gap +0.0049 /
+  +0.0028 at mask 0.05, +0.0059 / +0.0022 at 0.75, +0.0022 / −0.0075 at 1.0.
+  That is close to the 1 bp attention U-Net, with a little more
+  DNA-attributable gap at low mask rates (its 1 bp head adds DNA features
+  per position). See [the patched U-Net note](../2026-11-07/patched-unet.md).
 
 # Sources
 

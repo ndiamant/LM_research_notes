@@ -213,6 +213,52 @@ python3 patched-unet/scripts/compare_curves.py; python3 patched-unet/scripts/com
   all finished before it ended. The evaluation, h2 and the EMA timing ran in
   job 51468982.
 
+## Full run: patched U-Net + Muon + EMA, 400 epochs (2026-11-08)
+
+- **Run.** `ONT_mESC_unet_attn_p4_wide_h2_muon_ema` (script
+  `$SCRATCH/smfnet_patch/train_p4_wide_h2_muon_ema.sh`, code 05f0aea).
+  - Model: p4_wide_h2 with Muon lr 0.01 and EMA 0.999, 256 regions × 32
+    reads, foreach EMA.
+  - Muon trains the U-Net body; AdamW trains the stem and the head,
+    including the head conv blocks.
+  - Best checkpoint at epoch 399.
+- **Evaluation.** `$SCRATCH/smfnet_patch/eval_p4_muon_ema.sh` ran the same
+  steps as for the 1 bp models: fixed-mask rescoring, `eval_run_code.sh` with
+  `CODE=SMFNet_patch` (32 steps), the 64-step subset, and the memorization
+  diagnostics.
+
+| | 1 bp attention U-Net Muon+EMA | patched Muon+EMA | 1 bp AdamW+EMA |
+| --- | --- | --- | --- |
+| train s/epoch (mean) | 175 | **92** | ~173 |
+| sampling, regions/s (32 steps) | 2.9 | **6.3** | 2.9 |
+| fixed-mask val loss, final | **0.29314** | 0.29363 | 0.29361 |
+| profile Pearson, 32 steps (median) | 0.7598 | 0.7575 | 0.7556 |
+| corr-of-corr, 32 steps (median) | 0.6444 | 0.6450 | 0.6452 |
+
+- **Paired against the 1 bp Muon+EMA model, patched minus 1 bp:**
+  - **32 steps, 7,559 regions:**
+    - profile Pearson −0.0025 (0.0007);
+    - corr-of-corr −0.0001 (0.0003);
+    - run-length zeros +0.049 (0.018), ones −0.005 (0.017).
+  - **64 steps, 1,000 regions:**
+    - Pearson −0.0006 (0.0019);
+    - corr-of-corr −0.0007 (0.0008);
+    - run lengths within 1–2 SE.
+- **Reading.**
+  - The patched model is about 1.9× faster to train and 2.2× faster to
+    sample, with 0.7× the memory.
+  - It matches the 1 bp AdamW+EMA model and is ~0.0005 behind the best
+    1 bp Muon+EMA model on val loss.
+  - At 64 steps it is within noise of both.
+  - **Where the remaining deficit sits.** At mask 0.05 its val loss is 0.1936
+    vs 0.1929, and at mask 0.95 it is 0.5179 vs 0.5177
+    (`memorization_gap.py`). So the deficit is the fine read context, as in
+    the 30-epoch runs: the head blocks recovered most of it, but not all.
+- **Memorization profile.** About like the 1 bp attention U-Net: the
+  own-DNA gap is +0.0049 at mask 0.05 and +0.0022 at 1.0. It uses DNA more
+  at low mask rates, with a DNA benefit of 0.068 vs 0.059 on val at 0.05.
+  See [the memorization note](../2026-11-08/memorization.md).
+
 ## Batch shape: regions × reads per region
 
 - **Benchmark** (`bench_variants.py <variant> 1024 <regions> <reads>`):
