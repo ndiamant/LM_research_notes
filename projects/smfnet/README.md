@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-09: [Private dev repo kundajelab/SMFNet-dev next to the public kundajelab/SMFNet, for unreleased work with Till](2026-11-09/private-dev-repo.md)
 - 2026-11-09: [Kernel width vs depth in the attention U-Net, roofline and measured costs, and a k=9 one-block-per-down-level run at matched receptive field](2026-11-09/kernel-width.md)
 - 2026-11-08: [Do SMFNet models memorize training regions' DNA? Train vs val loss by mask rate, with own, wrong and mutated DNA](2026-11-08/memorization.md)
 - 2026-11-07: [Patched U-Net (4 bp patches, 1 bp head) matches the attention U-Net early in training at 0.6-0.8x the step and 0.7x the memory; Muon+EMA vs AdamW+EMA final results](2026-11-07/patched-unet.md)
