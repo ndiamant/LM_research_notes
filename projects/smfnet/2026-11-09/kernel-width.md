@@ -42,8 +42,10 @@ the up path, keeps exactly the default receptive field (1,772 bp).
   rather than receptive field.
 - **Sampled metrics:** within noise.
 
-**Not finished yet.** A full k=9 run with two down blocks (2× receptive
-field) is training as btrippe job 51631889.
+**k=9 with two down blocks (2× receptive field)** reached fixed-mask val
+loss 0.29259, against 0.29314 for k=5. That is the largest of the recent
+gains, at ~+10% step time and the same memory. The gain is at low to mid
+mask rates, and the sampled metrics are unchanged within noise (see below).
 
 # Key Points
 
@@ -134,6 +136,46 @@ field) is training as btrippe job 51631889.
   - The step-time saving (12% wall clock) costs about as much val loss as
     the AdamW-vs-Muon difference.
 
+## Training run: k=9 everywhere, two down blocks, at 256 × 32 (2× receptive field)
+
+- **Run.** `ONT_mESC_alphagenome_unet_attn_muon_ema_k9`
+  (`model.cfg.cnn_config.unet_kernel_size=9`).
+  - Otherwise identical to `ONT_mESC_alphagenome_unet_attn_muon_ema`: Muon
+    lr 0.01, EMA 0.999, 256 × 32, 400 epochs.
+  - btrippe job 51631889 with
+    [train_eval_attn_muon_ema_k9.sh](kernel-width/scripts/train_eval_attn_muon_ema_k9.sh).
+  - Training took 13.4 h (~120 s per epoch). Best checkpoint at epoch 398.
+
+| | k=5 (default) | k=9 |
+| --- | --- | --- |
+| fixed-mask val loss, final | 0.29314 | **0.29259** |
+| fixed-mask val loss, best checkpoint | 0.29318 (epoch 377) | **0.29259** (epoch 398) |
+| median profile Pearson / corr-of-corr, 32 steps | 0.7598 / 0.6444 | 0.7611 / 0.6444 |
+
+- **By mask rate** (`memorization_gap.py`, val, k=9 minus k=5):
+
+  | mask | 0.05 | 0.25 | 0.45 | 0.65 | 0.85 | 0.95 | 1.0 |
+  | --- | --- | --- | --- | --- | --- | --- | --- |
+  | Δ val cross-entropy | −0.0007 | −0.0008 | −0.0006 | −0.0005 | −0.0003 | −0.0001 | 0.0000 |
+
+  The gain is in fine-scale read context: the mirror image of the
+  one-down-block variant's loss.
+- **Memorization:** the own-DNA train − val gap rises by ≤ +0.0004.
+- **Paired, k=9 minus k=5, 32 steps** (7,559 val active regions):
+  - profile Pearson +0.0002 (0.0007);
+  - corr-of-corr −0.0000 (0.0003);
+  - residual corr-of-corr +0.0006 (0.0005);
+  - run-length zeros +0.012 (0.019), ones +0.016 (0.017).
+- **Paired, 64 steps** (1,000 regions):
+  - Pearson −0.0001 (0.0019);
+  - corr-of-corr +0.0001 (0.0007);
+  - run-length zeros +0.06 (0.05), ones +0.11 (0.05).
+- **Reading.** k=9 gives the largest val-loss gain of the recent changes,
+  bigger than Muon vs AdamW, for ~+10% step time and no extra memory. It is
+  not detectable in the sampled metrics at either step count. The one
+  2.5-SE difference (64-step run-length ones, worse) is one of eight
+  comparisons.
+
 ## Commands
 
 ```bash
@@ -162,9 +204,9 @@ They come with fp32 equivalence tests in `tests/test_fast_unet.py`.
 
 # Open Questions
 
-- **Does more receptive field help?** That is the k=9 run with two down
-  blocks (2× RF; btrippe job 51631889, 256 × 32, 400 epochs, compared with
-  0.29314). Its evaluation runs automatically after training.
+- **Does still more fine-scale context help** (k=13–15, or k=9 only at the
+  fine levels)? And does k=9 combine with 128 × 64 batches, and with the
+  patched U-Net, without losing its gain?
 - **Could a custom conv kernel make wide kernels nearly free at C=48–64?**
   For example, a Triton direct conv that loads a tile once for all k taps.
   The roofline says k≈12 should cost the same as k=5 at the 1 bp level.
