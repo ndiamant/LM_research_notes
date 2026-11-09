@@ -1,0 +1,27 @@
+Medians (7,559 val active regions); %gap = share of baseline-to-ceiling gap closed
+                                           baseline  ag_frozen  unet_attn  attn_muon_ema  attn_adamw_ema  p4_muon_ema  muon_ema_r64  r64_k9d1u5    atac  ceiling  ag_frozen %gap  unet_attn %gap  attn_muon_ema %gap  attn_adamw_ema %gap  p4_muon_ema %gap  muon_ema_r64 %gap  r64_k9d1u5 %gap  atac %gap
+metric                                                                                                                                                                                                                                                                                                    
+pearson_matched                              0.7296     0.7601     0.7568         0.7598          0.7556       0.7575        0.7595      0.7580  0.7723   0.8178         34.5530         30.8092             34.2591              29.4108           31.6689            33.8883          32.1788    48.3965
+pearson_flank_residual_matched               0.7020     0.7362     0.7292         0.7326          0.7313       0.7322        0.7330      0.7327  0.7466   0.8034         33.6848         26.8077             30.1979              28.9017           29.7650            30.5617          30.2185    44.0026
+covariation_corr_of_corr_pearson             0.6405     0.6441     0.6456         0.6444          0.6452       0.6450        0.6449      0.6447  0.6458   0.6821          8.6807         12.2569              9.4349              11.3107           10.7507            10.5606          10.1173    12.8439
+covariation_residual_corr_of_corr_pearson    0.2369     0.2437     0.2438         0.2466          0.2456       0.2450        0.2470      0.2448  0.2464   0.3235          7.8961          7.9862             11.2720              10.0431            9.4142            11.6830           9.2052    11.0302
+run_length_zeros_wasserstein                 3.3086     3.1556     3.1677         3.1839          3.1905       3.2314        3.1683      3.1825  3.1077   2.7389         26.8665         24.7344             21.8823              20.7360           13.5517            24.6248          22.1311    35.2684
+run_length_ones_wasserstein                  7.0983     7.1926     7.0558         7.1592          7.1115       7.1449        7.1413      7.1240  7.4338   4.5663         -3.7250          1.6776             -2.4063              -0.5211           -1.8403            -1.6981          -1.0149   -13.2506
+
+Paired per-region differences vs baseline: mean (SE) [share better]
+                                                        ag_frozen               unet_attn           attn_muon_ema          attn_adamw_ema             p4_muon_ema            muon_ema_r64              r64_k9d1u5                    atac
+metric                                                                                                                                                                                                                                   
+pearson_matched                            +0.0293 (0.0013) [62%]  +0.0264 (0.0013) [61%]  +0.0278 (0.0013) [61%]  +0.0263 (0.0013) [61%]  +0.0254 (0.0013) [60%]  +0.0277 (0.0013) [62%]  +0.0269 (0.0013) [61%]  +0.0369 (0.0014) [64%]
+pearson_flank_residual_matched             +0.0308 (0.0014) [62%]  +0.0282 (0.0014) [62%]  +0.0294 (0.0014) [62%]  +0.0278 (0.0014) [61%]  +0.0264 (0.0014) [60%]  +0.0290 (0.0014) [62%]  +0.0283 (0.0014) [62%]  +0.0402 (0.0015) [65%]
+covariation_corr_of_corr_pearson           +0.0032 (0.0004) [53%]  +0.0050 (0.0004) [56%]  +0.0046 (0.0004) [56%]  +0.0045 (0.0004) [56%]  +0.0045 (0.0004) [55%]  +0.0045 (0.0004) [56%]  +0.0045 (0.0004) [55%]  +0.0051 (0.0004) [55%]
+covariation_residual_corr_of_corr_pearson  +0.0048 (0.0007) [52%]  +0.0084 (0.0007) [55%]  +0.0080 (0.0007) [55%]  +0.0079 (0.0007) [54%]  +0.0083 (0.0008) [55%]  +0.0079 (0.0007) [54%]  +0.0075 (0.0007) [54%]  +0.0096 (0.0008) [55%]
+run_length_zeros_wasserstein               -0.3094 (0.0246) [55%]  -0.2319 (0.0271) [54%]  -0.2480 (0.0273) [55%]  -0.2126 (0.0266) [54%]  -0.1994 (0.0273) [53%]  -0.2769 (0.0265) [55%]  -0.2677 (0.0267) [54%]  -0.4418 (0.0294) [56%]
+run_length_ones_wasserstein                +0.1249 (0.0209) [47%]  -0.0320 (0.0222) [51%]  +0.0636 (0.0223) [48%]  +0.0507 (0.0225) [49%]  +0.0589 (0.0223) [49%]  +0.0494 (0.0220) [49%]  +0.0701 (0.0219) [49%]  +0.3054 (0.0233) [43%]
+
+Paired per-region, k9 one down block minus k5 (both 128x64 Muon+EMA): mean (SE) [share where k9 is better]
+  pearson_matched                               -0.0007 (0.0006) [50%]
+  pearson_flank_residual_matched                -0.0007 (0.0007) [49%]
+  covariation_corr_of_corr_pearson              -0.0001 (0.0003) [50%]
+  covariation_residual_corr_of_corr_pearson     -0.0004 (0.0005) [50%]
+  run_length_zeros_wasserstein                  +0.0093 (0.0174) [50%]
+  run_length_ones_wasserstein                   +0.0207 (0.0159) [49%]

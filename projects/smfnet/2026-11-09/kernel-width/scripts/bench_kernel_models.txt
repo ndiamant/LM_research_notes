@@ -1,0 +1,11 @@
+RESULT base         smf  1024 bp x 256 regions x  32 reads:  183.6 ms/step,  44.6k reads/s, peak  36.3 GiB, non-DNA-encoder params 3.45M
+RESULT base_k3      smf  1024 bp x 256 regions x  32 reads:  175.9 ms/step,  46.6k reads/s, peak  36.3 GiB, non-DNA-encoder params 2.96M
+RESULT base_k7      smf  1024 bp x 256 regions x  32 reads:  193.0 ms/step,  42.5k reads/s, peak  36.3 GiB, non-DNA-encoder params 3.93M
+RESULT base_k9      smf  1024 bp x 256 regions x  32 reads:  202.0 ms/step,  40.6k reads/s, peak  36.3 GiB, non-DNA-encoder params 4.42M
+RESULT base_k15     smf  1024 bp x 256 regions x  32 reads:  238.2 ms/step,  34.4k reads/s, peak  36.4 GiB, non-DNA-encoder params 5.88M
+RESULT base_e1      smf  1024 bp x 256 regions x  32 reads:  204.1 ms/step,  40.1k reads/s, peak  40.4 GiB, non-DNA-encoder params 3.81M
+RESULT base_e2      smf  1024 bp x 256 regions x  32 reads:  225.1 ms/step,  36.4k reads/s, peak  44.3 GiB, non-DNA-encoder params 4.17M
+RESULT base_k9_e1   smf  1024 bp x 256 regions x  32 reads:  227.9 ms/step,  35.9k reads/s, peak  40.4 GiB, non-DNA-encoder params 5.07M
+RESULT p4_wide_h2   smf  1024 bp x 256 regions x  32 reads:  150.8 ms/step,  54.3k reads/s, peak  25.2 GiB, non-DNA-encoder params 7.38M
+RESULT p4_wide_h2_k9 smf  1024 bp x 256 regions x  32 reads:  165.0 ms/step,  49.7k reads/s, peak  25.3 GiB, non-DNA-encoder params 9.95M
+RESULT p4_wide_h2_e1 smf  1024 bp x 256 regions x  32 reads:  164.8 ms/step,  49.7k reads/s, peak  27.6 GiB, non-DNA-encoder params 8.35M
