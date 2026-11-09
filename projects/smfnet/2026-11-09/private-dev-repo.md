@@ -94,6 +94,34 @@ git push origin release:main         # or open a PR from a pushed branch
 git remote set-url --push origin DISABLED                                       # disable again
 ```
 
+**Keep the dev-only `AGENTS.md` commits out of public releases.** Later on 2026-11-09, a "Git
+remotes" section was added to `AGENTS.md`. It tells agents to push to dev and never to public, and
+it names the private repo. It went into `main` and was cherry-picked onto every `nd_*` branch,
+so there are 7 copies of the commit "AGENTS.md: push to the private dev remote, never to public":
+
+| Branch | Commit |
+|---|---|
+| `main` | `7c9d002` |
+| `nd_alpha_genome` | `8c6a7b9` |
+| `nd_atac` | `5a1e369` |
+| `nd_cheri` | `f9bf85e` |
+| `nd_unet` | `c2e877c` |
+| `nd_unet_fast` | `9cce437` |
+| `nd_unet_patch` | `1faa25d` |
+
+A plain `git merge dev/main` (or of any `nd_*` branch) into public would publish that section, so
+release by cherry-picking and leave these commits out. To check a release branch before pushing:
+
+```bash
+git log --oneline origin/main..release --grep="private dev remote"   # should print nothing
+git diff origin/main release -- AGENTS.md | grep -i "SMFNet-dev"      # should print nothing
+```
+
+Cherry-pick was chosen over rebase to get the section onto the branches. Rebase would have
+rewritten branch hashes that other notes cite, needed force-pushes to dev, pulled newer `main`
+commits (e.g. the ruff formatting) into 10-20 commit stacks, and changed branches under agents
+working in the worktrees.
+
 At setup time, two untracked files sat in the public clone's working tree:
 `ALPHAGENOME_IMPLEMENTATION_PLAN.md` and `ATAC_IMPLEMENTATION_PLAN.md`. They are not in either
 repo. To share them with Till, commit them on a dev-tracked branch.
