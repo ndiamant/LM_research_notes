@@ -178,6 +178,40 @@ $PIXI python summarize.py; $PIXI python gap_control.py
   `$SCRATCH/src/SMFNet_atac/src`.
 - **Results:** `$SCRATCH/smfnet_memorization/results/<model>_<ac|bg>_<train|val>.json`.
 
+## Fewer region visits: 128 regions × 64 reads (added 2026-11-08)
+
+- **Run.** The 1 bp attention U-Net with Muon+EMA, retrained at 128
+  regions × 64 reads with `trainer.max_epochs=200 model.cfg.warmup_epochs=5`:
+  - the same steps (182,000), reads per step and LR schedule as the
+    256 × 32, 400-epoch run;
+  - each training region visited 200 times instead of 400.
+- **Paths.** Run dir `ONT_mESC_alphagenome_unet_attn_muon_ema_r64`, script
+  `$SCRATCH/smfnet_patch/train_eval_attn_muon_ema_r64.sh`. Code nd_unet_patch
+  05f0aea, with the speed options.
+- **Time.** Training took 11.5 h, at ~240 ms per step with Muon and EMA.
+
+| | 256 × 32, 400 epochs | 128 × 64, 200 epochs |
+| --- | --- | --- |
+| fixed-mask val loss, final | 0.29314 | 0.29318 |
+| own-DNA gap at mask 0.05 / 0.75 / 1.0 | +0.0049 / +0.0056 / +0.0016 | +0.0048 / +0.0055 / +0.0013 |
+| mutation cost train/val at mask 1.0 | 0.0047 / 0.0037 | 0.0046 / 0.0037 |
+| median profile Pearson / corr-of-corr, 32 steps | 0.7598 / 0.6444 | 0.7595 / 0.6449 |
+
+- **Paired, 128 × 64 minus 256 × 32, 32 steps:**
+  - profile Pearson −0.0002 (0.0006);
+  - corr-of-corr −0.0001 (0.0003);
+  - run-length zeros −0.029 (0.017), ones −0.014 (0.016).
+- **Paired, 64 steps:** Pearson +0.0026 (0.0017), corr-of-corr +0.0001
+  (0.0007).
+- **Reading.** No difference in val loss, sampled metrics or memorization.
+  This frozen-AlphaGenome model memorized little DNA to begin with, so
+  halving the region visits had nothing to remove.
+  - Its DNA benefit at low mask rates is larger (0.073 vs 0.059 on val at
+    mask 0.05), with the own-DNA loss unchanged.
+  - Fewer visits, or more jitter, would be tested better on a model with a
+    trained DNA encoder.
+  - For this model 128 × 64 is a free ~9% speedup.
+
 # Related Notes
 
 - [Frozen AlphaGenome encoder](../2026-10-29/frozen-alphagenome-encoder.md):
