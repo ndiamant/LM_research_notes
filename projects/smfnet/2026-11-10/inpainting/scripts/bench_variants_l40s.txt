@@ -1,0 +1,7 @@
+RESULT k9           smf  1024 bp x 128 regions x  32 reads:  322.9 ms/step,  12.7k reads/s, peak  19.4 GiB, non-DNA-encoder params 4.42M
+RESULT k9_linear    smf  1024 bp x 128 regions x  32 reads:  327.9 ms/step,  12.5k reads/s, peak  19.7 GiB, non-DNA-encoder params 4.42M
+RESULT k9_dilated   smf  1024 bp x 128 regions x  32 reads:  321.3 ms/step,  12.8k reads/s, peak  19.4 GiB, non-DNA-encoder params 4.42M
+RESULT k9_local_attn smf  1024 bp x 128 regions x  32 reads:  349.4 ms/step,  11.7k reads/s, peak  21.2 GiB, non-DNA-encoder params 4.45M
+RESULT k9_bottleneck16 smf  1024 bp x 128 regions x  32 reads:  329.7 ms/step,  12.4k reads/s, peak  20.1 GiB, non-DNA-encoder params 2.41M
+RESULT k9_read_masked smf  1024 bp x 128 regions x  32 reads:  364.9 ms/step,  11.2k reads/s, peak  29.9 GiB, non-DNA-encoder params 4.42M
+RESULT k9_window    smf  1024 bp x 128 regions x  32 reads:  394.4 ms/step,  10.4k reads/s, peak  36.1 GiB, non-DNA-encoder params 4.42M

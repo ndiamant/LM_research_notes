@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-10: [Span-inpainting metric; the U-Net's long-gap weakness and its drift over training; inpainting-variant sweep; k=9 + dilated fine convs as the new best (val loss 0.29229)](2026-11-10/inpainting.md)
 - 2026-11-09: [Private dev repo kundajelab/SMFNet-dev next to the public kundajelab/SMFNet, for unreleased work with Till](2026-11-09/private-dev-repo.md)
 - 2026-11-09: [Kernel width vs depth in the attention U-Net, roofline and measured costs, and a k=9 one-block-per-down-level run at matched receptive field](2026-11-09/kernel-width.md)
 - 2026-11-08: [Do SMFNet models memorize training regions' DNA? Train vs val loss by mask rate, with own, wrong and mutated DNA](2026-11-08/memorization.md)
