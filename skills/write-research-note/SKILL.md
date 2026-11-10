@@ -35,10 +35,11 @@ If the current task is running in a different repository, use the notes reposito
 4. Use the repository's required date convention. If none is specified, use the local date in the user's configured timezone.
 5. Create the project folder, date folder, and project `README.md` index when missing.
 6. Write the note as Markdown with YAML frontmatter and the section structure required by `AGENTS.md`.
-7. Link related notes using GitHub-compatible relative Markdown links when they influenced the reasoning, provide background, contain supporting evidence, or record a related decision.
-8. Update the project index with a relative link to the new or changed note.
-9. Review the diff for unrelated changes before committing.
-10. Follow the notes repo's git workflow. Commit completed changes locally, then attempt the configured push if requested or required. If pushing fails because network access, authentication, sandboxing, or the remote is unavailable, report the commit hash and failure.
+7. Copy key figures (small PNGs) into the note's companion folder and embed them, following the `Figures` section of `AGENTS.md`.
+8. Link related notes using GitHub-compatible relative Markdown links when they influenced the reasoning, provide background, contain supporting evidence, or record a related decision.
+9. Update the project index with a relative link to the new or changed note.
+10. Review the diff for unrelated changes before committing.
+11. Follow the notes repo's git workflow. Commit completed changes locally, then attempt the configured push if requested or required. If pushing fails because network access, authentication, sandboxing, or the remote is unavailable, report the commit hash and failure.
 
 ## Note Writing Rules
 
@@ -62,6 +63,14 @@ Record:
 - deviations from the original plan and the commands used to patch or recover the run.
 
 Do not inline large generated scripts when they are available as durable files. Link to the scripts and include the minimal command block needed to rerun them.
+
+## Figures
+
+Include small PNG figures when a plot shows the finding better than prose. `AGENTS.md` in the notes repo has the full rules; in short:
+
+- Copy figures into `projects/<project>/<YYYY-MM-DD>/<note-slug>/` and embed them with `![alt](<note-slug>/figure.png)`. Do not rely on `$SCRATCH` paths, which are purged.
+- Aim for under 200 KB per image; ask the user before adding one over 500 KB. Quantizing to 256 colors with Pillow usually shrinks plots 2–3x.
+- Add a one-sentence caption stating the takeaway, and record the command that produced the figure.
 
 ## Related Notes
 
