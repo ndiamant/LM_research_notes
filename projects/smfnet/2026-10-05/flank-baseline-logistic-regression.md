@@ -36,6 +36,11 @@ additive. It sits alongside the sequence-blind positional baselines from
   - The likely cause is strand-specific capture before bisulfite conversion.
     This is inferred, not confirmed.
   - A model can therefore earn profile correlation from local context alone.
+
+  ![MEL GpC methylation, context vs its reverse complement](flank-baseline-logistic-regression/context_bias_MEL_flank2.png)
+
+  *The 20 ±2 bp GpC contexts with the largest gap to their reverse complement in MEL (≥100k calls
+  each), ranging from +5.3 to +11.3 percentage points. Output of `plot_context_bias.py`.*
 - **Model.** logit(site mean) = bias + Σ over flank positions of
   w[position, base].
   - Defaults: ±5 bp flanks and a small L2 penalty, fit with LBFGS.
@@ -140,4 +145,5 @@ CUDA_VISIBLE_DEVICES="" $GROUP_HOME/uv-envs/SMFNet-cu124/bin/python \
   `tests/test_evaluation_flank_baselines.py`.
 - Strand-asymmetry analyses: `/scratch/users/diamant/gch_rc_analysis/strand_symmetry_control.py`,
   `plot_context_bias.py` and `context_bias_MEL_flank2.png`.
+  Figure copy: [context_bias_MEL_flank2.png](flank-baseline-logistic-regression/context_bias_MEL_flank2.png).
 - Validation check: `/scratch/users/diamant/gch_rc_analysis/kmer_baseline_check.py`.

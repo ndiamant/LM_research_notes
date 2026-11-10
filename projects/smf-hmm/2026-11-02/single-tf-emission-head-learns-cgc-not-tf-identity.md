@@ -74,6 +74,11 @@ show the intended difference, but the head learned little of it:
     [m6A context-bias note](../2026-10-30/fiberseq-m6a-sequence-context-bias.md).
 - `h` is the TF channel of the prior's emission output, computed on full 2,114 bp regions.
 
+![Emission head offset h against the ±3 context tables](single-tf-emission-head-learns-cgc-not-tf-identity/emission_head_vs_context.png)
+
+*Across val ±3 contexts, mean `h` falls as the raw and adjusted P(x = 1) tables rise, and a ±2
+table already explains about 80% of its variance. Output of `compare_emission_head.py`.*
+
 **Why CGC is probably an artifact (inferred, not confirmed).** The docstring of
 `reverse_complement_dna_and_smf` in `smf_hmm/data.py` describes how the pipeline building the h5
 handles reverse-strand reads. A bottom-strand call at a forward GCG lands on one cytosine that
@@ -97,6 +102,12 @@ sites.
   - The residual is near 0 outside the motif core for every TF.
   - The CTCF residual is two peaks of about +0.4 in the motif. It is absent across the
     ±20 bp footprint seen in the data.
+
+![Emission head and observed x = 1 rate at TF motifs](single-tf-emission-head-learns-cgc-not-tf-identity/emission_head_at_motifs.png)
+
+*Left: raw `h` and its ±4-context residual by position at each TF's motifs. Right: observed
+P(x = 1) at bound and low-ChIP sites. Only bound CTCF shows a wide data footprint, while the
+residual stays inside the motif core (shaded). Output of `emission_head_at_motifs.py`.*
 
 **Interpretation (partly inferred).**
 - The CTCF > ESRRB ordering in the residual means the head learned some TF identity.
@@ -168,6 +179,7 @@ The ±2 bp breakdown and the CGC same-read agreement came from one-off snippets 
 # Sources
 
 - Run directory: `/scratch/users/diamant/2026-11-02_fixed_blocks_single_tf_global_kl3` (checkpoints, `.hydra/config.yaml`, `emission_context_bias/`, `plots/val_seed0_emissions/`)
+- Figure copies from that run's `emission_context_bias/`: [emission_head_vs_context.png](single-tf-emission-head-learns-cgc-not-tf-identity/emission_head_vs_context.png), [emission_head_at_motifs.png](single-tf-emission-head-learns-cgc-not-tf-identity/emission_head_at_motifs.png)
 - smf_hmm: `evaluation/emission_context_bias/compare_emission_head.py`, `evaluation/emission_context_bias/emission_head_at_motifs.py`, `smf_hmm/cli/plot.py`, `smf_hmm/plot.py`, `smf_hmm/emission_modules.py`, `smf_hmm/data.py` (branch `nd/experiments`, base `d0d5c32`, uncommitted as of this note)
 - Motif/ChIP cache: `/scratch/users/diamant/mesc_validation/benchmark_cache/mesc_tf_chip_validation_v1`; config `evaluation/tf_chip/configs/mesc_validation.yaml`; motifs `evaluation/tf_chip/references/` (JASPAR MA0139.2, MA0141.2, MA0039.2, MA0142.1)
 - SMF data: `/scratch/groups/btrippe/ndiamant/ONT_mESC_acRegions.h5`; genome `/scratch/groups/btrippe/ndiamant/mm10.fa`

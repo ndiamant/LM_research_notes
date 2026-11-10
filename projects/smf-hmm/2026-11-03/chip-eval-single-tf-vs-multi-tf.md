@@ -215,6 +215,15 @@ one-off checks on the example site).
   unbound excess, is about +0.02–0.03 on both chromosomes. CTCF's is about +0.4. In
   `meta_profiles.png`, the bound OCT4 hump spans roughly ±15–20 bp, wider than the narrow
   context bump. Unbound OCT4 sites show only the context bump.
+
+  ![Motif meta-profiles, chr8](chip-eval-single-tf-vs-multi-tf/meta_profiles_chr8.png)
+
+  ![Motif meta-profiles, chr16](chip-eval-single-tf-vs-multi-tf/meta_profiles_chr16.png)
+
+  *Observed (solid) and context-predicted (dashed) P(x = 1) around each TF's motifs at bound
+  (top ChIP quartile) and unbound (bottom quartile) sites, chr8 then chr16. Left: all reads.
+  Right: locally accessible reads, under the filter discussed in the caveat above. Only bound
+  CTCF rises well above its context prediction.*
 - **Reference scores.** Spearman with pooled ChIP, chr8 / chr16. "Accessibility" is the
   fraction of accessible calls within ±25 bp of the motif; "motif score" is the external PWM
   score; "access + motif" is the sum of their ranks.
@@ -334,4 +343,4 @@ done
 - Posteriors: `.../posteriors/{single_tf_147_merged_cgc,single_tf_tapered,fixed_blocks_tapered,single_tf}.h5` (new); `{geometric,phase_type,neural_global,hiddenfoot}.h5` (existing)
 - Checkpoints: `/scratch/users/diamant/{2026-11-03_single_tf_147_histone_merged_cgc_global_kl3,2026-09-29_single_tf_tapered_histone_global_kl3,2026-09-29_fixed_blocks_tapered_histone_global_kl3,2026-11-02_fixed_blocks_single_tf_global_kl3,2026-09-29_fixed_blocks_global_kl3}/checkpoints`
 - smf_hmm `nd/experiments`: `7cd90ea` (`smf_hmm/posterior_inference.py`, `smf_hmm/cli/infer_posterior.py`, `tests/test_posterior_inference.py`); `evaluation/tf_chip/plot_posterior_examples.py`, `tests/test_tf_chip_plot_posterior_examples.py` and `evaluation/tf_chip/motif_call_diagnostics.py` (uncommitted)
-- Diagnostics outputs: `.../analysis_2026-11-03/motif_call_diagnostics/{results.json,meta_profiles.png}` for chr8 and chr16
+- Diagnostics outputs: `.../analysis_2026-11-03/motif_call_diagnostics/{results.json,meta_profiles.png}` for chr8 and chr16; figure copies: [meta_profiles_chr8.png](chip-eval-single-tf-vs-multi-tf/meta_profiles_chr8.png), [meta_profiles_chr16.png](chip-eval-single-tf-vs-multi-tf/meta_profiles_chr16.png)

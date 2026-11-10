@@ -58,6 +58,12 @@ accessibility.
   0.002) and G/C flanks are enriched (`CC[A]GC`, `AG[A]GC` about 0.23). These rates are at the
   median accessibility bin of active windows.
 
+![Context-width gain curves and kL x kR grid](fiberseq-m6a-sequence-context-bias/context_bias.png)
+
+*Held-out gain levels off by ±3–4 bp, the 3′ side carries more than the 5′ side, and in the raw
+grid (3, 4) already reaches 0.96 of the ±6 gain. Copied from `context_bias.png` at smf_hmm
+commit `d20f916`; see Commands.*
+
 # Details
 
 ## Aggregation (`aggregate_sites.py`)

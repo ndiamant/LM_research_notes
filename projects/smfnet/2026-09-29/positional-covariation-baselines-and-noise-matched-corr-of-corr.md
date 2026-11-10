@@ -72,6 +72,16 @@ versions are the informative ones. None of this is in `metrics.py` yet.
   profiles match. GCG sites sit about 0.08 lower everywhere, a constant offset
   rather than a different shape.
 
+![Train mean call by position and site type](positional-covariation-baselines-and-noise-matched-corr-of-corr/profile.png)
+
+*Train mean call dips from about 0.72 on the flanks to 0.55 at the region centre, smoothing and
+mirroring barely change it, and GCG sites sit lower everywhere with the same shape.*
+
+![Train mean pair correlation by separation and midpoint](positional-covariation-baselines-and-noise-matched-corr-of-corr/decay_by_midpoint.png)
+
+*Train pair correlation oscillates with ~190 bp nucleosome phasing, and the phasing is stronger
+for midpoints far from the centre. Right: pair counts per bp of separation.*
+
 # Details
 
 ## Earlier metric changes this builds on
@@ -107,6 +117,12 @@ baselines" on `nd/prism_validation`. They are **not** on `nd/more_assays`.
 | Model, all 1,024 reads | 0.812 | 0.758 | 0.387 |
 | Pseudo-replicate | — | 0.657 | 0.302 |
 | Positional baseline | 0.294 | 0.715 | 0 (by construction) |
+
+![Test preview: model vs positional baseline and pseudo-replicate](positional-covariation-baselines-and-noise-matched-corr-of-corr/test_preview.png)
+
+*Per-region distributions (left) and per-region scatter (right) for profile Pearson,
+corr-of-corr and residual corr-of-corr. The model beats the baseline on profile and, scored from
+all reads, on corr-of-corr. Quantized to 256 colours from the 608 KB original.*
 
 - **The replay matches the metrics exactly.** The preview replays each region's
   `region_generator(seed=0, index)` draw of `_prepare_{mmd,matched}_samples`
@@ -191,6 +207,7 @@ on both branches.
   - `profile_bandwidths.tsv`, `covariation_bandwidths.tsv`: val bandwidth sweeps
   - `test_preview.tsv`: per-region baseline and model scores joined to `metrics.tsv`
   - `profile.png`, `decay_by_midpoint.png`, `test_preview.png`
+    (copied here: [profile.png](positional-covariation-baselines-and-noise-matched-corr-of-corr/profile.png), [decay_by_midpoint.png](positional-covariation-baselines-and-noise-matched-corr-of-corr/decay_by_midpoint.png), [test_preview.png](positional-covariation-baselines-and-noise-matched-corr-of-corr/test_preview.png))
   - `baselines.npz`: fitted profile and pair grid, with raw sums and counts
 - Model evaluated: `downsample_025` checkpoint
   `/scratch/users/diamant/smf_models/SMFNet_downsample/downsample_025/epoch=47-step=21840.ckpt`,

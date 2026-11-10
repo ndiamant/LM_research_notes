@@ -58,6 +58,14 @@ Results, compared with the baseline run `2026-09-29_single_tf_tapered_histone_gl
 | other_long | 0.99 (at ceiling) | 0.99 (at ceiling) |
 | histone edge → core | 0.20 (at floor) → 0.99 | **0.27** → 0.99 |
 
+![Learned emissions, baseline run](merged-cgc-147bp-histone-run/emissions_baseline.png)
+
+![Learned emissions, merged-CGC run](merged-cgc-147bp-histone-run/emissions_merged_cgc.png)
+
+*Learned P(x = 1) by position within each block, baseline (top) and new run (bottom). The new
+histone edge starts at 0.27 and ramps over a longer stretch, and the TF band reaches lower. Both
+are `plots/.../emissions.png` from each run directory.*
+
 - **MAP state statistics** (val reads):
 
 | | baseline | new |
@@ -81,6 +89,13 @@ Results, compared with the baseline run `2026-09-29_single_tf_tapered_histone_gl
   - Correlation with the accessibility-adjusted ±3 P(x = 1) table: Pearson 0.16, Spearman 0.28.
     Baseline: −0.36 / −0.21.
   - As a predictor of x, the head gains 0.0011 bits/call held-out; the ±3 table gains 0.0108.
+
+  ![Emission head offset h against the ±3 context tables, new run](merged-cgc-147bp-histone-run/emission_head_vs_context.png)
+
+  *After the merge, the high-`h` cluster is CpG rather than GCG contexts, `h` rises with the
+  adjusted table, and a ±k table explains less of its variance than in the
+  [earlier run](../2026-11-02/single-tf-emission-head-learns-cgc-not-tf-identity.md). Output of
+  `compare_emission_head.py`.*
 - **At motifs:** what's left of the head after removing ±4 bp context, inside the motif at
   bound sites. "Footprint" is the data's motif-minus-flank x = 1 rate at bound sites. Bound
   means the top quartile of pooled ChIP-nexus.
@@ -95,6 +110,12 @@ Results, compared with the baseline run `2026-09-29_single_tf_tapered_histone_gl
 \*From the [emission-head note](../2026-11-02/single-tf-emission-head-learns-cgc-not-tf-identity.md):
 run `2026-11-02_fixed_blocks_single_tf_global_kl3`, which has no taper. This row is not the
 baseline above.
+
+![Emission head and observed x = 1 rate at TF motifs, new run](merged-cgc-147bp-histone-run/emission_head_at_motifs.png)
+
+*Left: raw `h` and its ±4-context residual at each TF's motifs. Right: observed P(x = 1) at
+bound and low-ChIP sites. As before, the residual stays in the motif core (shaded) and only bound
+CTCF has a wide data footprint. Output of `emission_head_at_motifs.py`.*
 
 # Details
 
@@ -191,5 +212,6 @@ MPLCONFIGDIR=$PWD/.mplconfig $PY -m evaluation.emission_context_bias.emission_he
 
 - New run: `/scratch/users/diamant/2026-11-03_single_tf_147_histone_merged_cgc_global_kl3` (`train.sh`, `train.log`, `plots/val_seed0/emissions.png`, `emission_context_bias/results.json`, `motif_results.json`, `emission_head_at_motifs.png`)
 - Baseline run: `/scratch/users/diamant/2026-09-29_single_tf_tapered_histone_global_kl3` (`plots/val_seed0_emission_profiles/emissions.png`)
+- Figure copies: [emissions_merged_cgc.png](merged-cgc-147bp-histone-run/emissions_merged_cgc.png), [emissions_baseline.png](merged-cgc-147bp-histone-run/emissions_baseline.png), [emission_head_vs_context.png](merged-cgc-147bp-histone-run/emission_head_vs_context.png), [emission_head_at_motifs.png](merged-cgc-147bp-histone-run/emission_head_at_motifs.png) (the last two from the new run)
 - smf_hmm `nd/experiments`: `776dbd9` (`smf_hmm/data.py`, `tests/test_data.py`), `cafcf18` (`smf_hmm/plot.py`, `smf_hmm/cli/plot.py`, `smf_hmm/emission_modules.py`), `783cd11` (`evaluation/emission_context_bias/`)
 - Data: `/scratch/groups/btrippe/ndiamant/ONT_mESC_acRegions.h5`, `/scratch/groups/btrippe/ndiamant/mm10.fa`; motif cache `/scratch/users/diamant/mesc_validation/benchmark_cache/mesc_tf_chip_validation_v1`
