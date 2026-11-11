@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-11: [GM12878 Fiber-seq through the figwig loader: the AlphaGenome dilated U-Net beats the original CNN on every sample metric (~30% smaller gap to the ceiling, val loss 0.17905 vs 0.17971) and trains 2.9x faster](2026-11-11/fiberseq-figwig-unet-vs-cnn.md)
 - 2026-11-10: [Span-inpainting metric; the U-Net's long-gap weakness and its drift over training; inpainting-variant sweep; k=9 + dilated fine convs as the new best (val loss 0.29229)](2026-11-10/inpainting.md)
 - 2026-11-09: [Private dev repo kundajelab/SMFNet-dev next to the public kundajelab/SMFNet, for unreleased work with Till](2026-11-09/private-dev-repo.md)
 - 2026-11-09: [Kernel width vs depth in the attention U-Net, roofline and measured costs, and a k=9 one-block-per-down-level run at matched receptive field](2026-11-09/kernel-width.md)
