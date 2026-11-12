@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-12: [AG prior with phase-type states and a 40 bp TF cap — the prior chains capped TFs through short open gaps; worst at full prior, matches phase-type with the prior off](2026-11-12/fiber-ag-phase-type-structure-run.md)
 - 2026-11-12: [Per-read m6A rate — reads above ~12% carry less binding information and shift state usage; 8-12% are as good as 2-8%; a strict 2-8% filter is a poor trade](2026-11-12/fiber-read-m6a-rate-evaluation.md)
 - 2026-11-12: [Scaling the AG prior at inference — a half-strength prior ties phase-type on most TFs and ranks bound sites best](2026-11-12/fiber-prior-scale-ablation.md)
 - 2026-11-12: [IDR-labelled GM12878 Fiber-seq TF benchmark — phase-type wins bound-vs-unbound on every TF; within bound sites the neural models and the AG prior alone tie it on footprint TFs](2026-11-12/fiber-idr-chip-benchmark.md)
