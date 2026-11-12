@@ -1,5 +1,5 @@
 ---
-title: 16 kb Fiber-seq pilot (16,384 bp of reads from 18,432 bp of DNA); its gains come from reading the rest of the molecule, its generated reads lack half the molecule-wide (labelling) variance, and a design for modelling labelling efficiency and enzyme bias
+title: 16 kb Fiber-seq pilot (16,384 bp of reads from 18,432 bp of DNA); its gains come from reading the rest of the molecule, its generated reads lack half the molecule-wide (labelling) variance, two inserted CTCF elements co-vary even 12 kb apart (orientation-independent), and a design for modelling labelling efficiency and enzyme bias
 date: 2026-11-12
 project: smfnet
 agent: Claude Code (claude-opus-5-5)
@@ -28,7 +28,11 @@ component is technical: per-molecule labelling efficiency. Adjusting for each re
 labelling level, observed and generated co-accessibility match at long range and the
 generated short-range (nucleosome-scale) coupling is 10-20% weak. Specific long-range
 co-accessibility does exist between CTCF sites (partial r +0.14 given labelling level vs
-+0.02 for random position pairs).
++0.02 for random position pairs), and the model generates it: two inserted 3x CTCF elements
+co-vary on generated molecules (partial r ~0.19 at 2-8 kb, 0.15 at 12 kb, against ~0 for an
+element and an empty site), far beyond the convolutions' +/-1.5 kb reach, with no
+dependence on motif orientation. Profiles are near the pseudo-replicate ceiling (98-99.6%
+of the gap closed) but run lengths are not (83-85%), consistent with the labelling deficit.
 
 The agreed next step models labelling explicitly: a per-molecule efficiency estimated
 without information about region activity, and an emission head
@@ -85,6 +89,15 @@ the network as conditioning.
 
   At >= 100 molecules: CTCF-CTCF 18% p < 0.001 (n = 55) vs random 0.85%. 480 / 52,941 real
   pairs at FDR < 0.05.
+- **metrics.py** on the 1,000 val regions (no positional baselines): profile Pearson 0.756
+  (ceiling 0.770, gap closed 0.981), Spearman 0.779 (0.783, 0.996); run-length Wasserstein,
+  accessible 0.515 bp (ceiling 0.168, null 2.25, 0.833), protected 4.35 bp (2.28, 16.2,
+  0.852). Not directly comparable with the 2 kb model's 0.96-0.97 (other windows and read
+  rule), but run lengths depend strongly on labelling (light molecules merge footprints), so
+  they are a natural check for the efficiency conditioning.
+- **Inserted CTCF pairs** (Till's suggestion; see Details): partial r 0.19-0.21 / 0.18-0.19 /
+  0.17-0.19 / 0.14-0.15 at 2 / 5 / 8 / 12 kb; convergent minus divergent within
+  +/-0.016 (about 1 SE) at every distance.
 
 # Details
 
@@ -137,6 +150,49 @@ around the most accessible active element; diverging blue-grey-red clipped at +/
 all generated reads; protection on the read heatmaps and profiles. Mola (Wang et al., bioRxiv
 2026) bins at 20 bp over 3 kb views, shows 10x generated molecules, and scores maps by mean
 row correlation against a split-half Spearman-Brown ceiling.
+
+## In-silico insertion of two CTCF elements (Till's suggestion)
+
+Till (colleague): does the model learn interactions beyond 5 kb? Insert two convergent CTCF
+elements, three motifs each, as the strongest case. Mola ran a similar screen (two synthetic
+DHSs of three homotypic motifs at offsets 0, 50, 100 bp, 1-8 kb apart).
+
+- Design: JASPAR MA0139.1 consensus `TGGCCACCAGGGGGCGCTA` x3 at offsets 0, 50, 100 bp per
+  element; two elements centred in the 16 kb read window, 2, 5, 8 or 12 kb apart;
+  convergent (forward on the left element, reverse complement on the right, pointing
+  inward), divergent, tandem, each element alone, and no insertion; 50 val background
+  windows (chr8/chr20, GC-matched background class); 256 generated reads each (32 steps,
+  bf16), 1,050 sequences, 18 min on the H100.
+- Readouts: accessibility within +/-100 bp of each element; the two elements' raw and
+  partial correlation across reads given each read's labelling level (its accessibility over
+  the window excluding +/-300 bp around both positions); read-level-adjusted maps averaged
+  over backgrounds.
+
+| d | element access | pair partial r | element vs empty site | convergent - divergent |
+|---|---|---|---|---|
+| 2 kb | 0.30 | 0.19-0.21 | 0.00-0.02 | +0.014 +/- 0.012 |
+| 5 kb | 0.29 | 0.18-0.19 | 0.01-0.02 | -0.003 +/- 0.012 |
+| 8 kb | 0.28 | 0.17-0.19 | 0.00-0.01 | +0.016 +/- 0.011 |
+| 12 kb | 0.27 | 0.14-0.15 | 0.00-0.02 | +0.010 +/- 0.010 |
+
+Background accessibility at the same positions is about 0.12. A partner raises an element's
+accessibility by only 0.002-0.009.
+
+![Inserted CTCF pairs](fiberseq-16kb-pilot-labelling-efficiency/ctcf_insertion.png)
+
+*Two inserted CTCF elements co-vary on generated molecules at every distance, with an
+off-diagonal spot in the averaged maps, regardless of orientation; one element and an empty
+site do not.*
+
+Interpretation (inferred): the coupling at 12 kb has to pass through the bottleneck
+attention, so the model does represent long-range dependence between strong elements; its
+size is close to the observed CTCF-CTCF partial correlation (+0.136, real sites are weaker
+than consensus triplets). Orientation regulates loop extrusion and contacts, with no
+strong expectation for co-accessibility, so its absence may be biology or may mean the
+model treats CTCF elements as generic strong openers. Untested control: the same insertion
+with a strong non-CTCF opener (e.g. Mola's IRF cluster) and mixed pairs; observed non-CTCF
+active pairs barely exceed the null (+0.029), so a model that learned the biology should
+couple them much more weakly.
 
 ## Training-design discussion (recorded in FIGWIG_TODO.md, not yet built)
 
@@ -191,6 +247,8 @@ python rescore_centre.py --long <16 kb ckpt> --short <2 kb ckpt> --out ... --mas
 bash $SCRATCH/smfnet_figwig/eval_16kb_steps.sh               # 32 / 64 / 128 steps, 300 regions
 python compare_samples.py --samples <samples.h5> --out <dir> --elements candidates.bed
 python element_pairs_partial.py                               # CRE pairs, ~30 min on CPU
+python ctcf_insertion.py --checkpoint <16 kb ckpt> --out $SCRATCH/smfnet_figwig/ctcf_pairs/run50
+python analyse_ctcf_insertion.py $SCRATCH/smfnet_figwig/ctcf_pairs/run50
 python molecule_efficiency.py <figwig dir> <out dir> chr1 ... # 4 processes in parallel
 ```
 
@@ -225,7 +283,8 @@ is now a dangling symlink.
 - Does the 16 kb model reproduce the CTCF-CTCF partial correlations (needs regions chosen
   to contain such pairs)? Is the 10-20% short-range deficit a sampler or model limit
   (remasking test)?
-- metrics.py on the 1,000-region samples was still running when this note was written.
+- Is the inserted-pair coupling CTCF-specific? (Insert a strong non-CTCF opener, and mixed
+  pairs.) Does orientation matter for any readout once labelling is modelled?
 
 # Sources
 
