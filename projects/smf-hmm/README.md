@@ -2,6 +2,8 @@
 
 ## Notes
 
+- 2026-11-12: [Per-read m6A rate — reads above ~12% carry less binding information and shift state usage; 8-12% are as good as 2-8%; a strict 2-8% filter is a poor trade](2026-11-12/fiber-read-m6a-rate-evaluation.md)
+- 2026-11-12: [Scaling the AG prior at inference — a half-strength prior ties phase-type on most TFs and ranks bound sites best](2026-11-12/fiber-prior-scale-ablation.md)
 - 2026-11-12: [IDR-labelled GM12878 Fiber-seq TF benchmark — phase-type wins bound-vs-unbound on every TF; within bound sites the neural models and the AG prior alone tie it on footprint TFs](2026-11-12/fiber-idr-chip-benchmark.md)
 - 2026-11-11: [The fiber AG model sends many TF footprints to other_long, which absorbs 16% of positions; Fiber-seq protected-stretch lengths depend on read methylation and lightly methylated reads merge dinucleosomes](2026-11-11/fiber-other-long-footprint-reads-and-linkers.md)
 - 2026-11-11: [Fiber-seq neural HMMs "lose" to phase-type on P(TF) because they call bound, unprotected DNA open; on P(TF+open) they tie, and among strongly bound footprint-TF sites P(TF) ties too](2026-11-11/fiber-neural-vs-phase-type-nucleosome-free.md)
