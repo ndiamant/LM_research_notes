@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-11: [The fiber AG model sends many TF footprints to other_long, which absorbs 16% of positions; Fiber-seq protected-stretch lengths depend on read methylation and lightly methylated reads merge dinucleosomes](2026-11-11/fiber-other-long-footprint-reads-and-linkers.md)
 - 2026-11-11: [Fiber-seq neural HMMs "lose" to phase-type on P(TF) because they call bound, unprotected DNA open; on P(TF+open) they tie, and among strongly bound footprint-TF sites P(TF) ties too](2026-11-11/fiber-neural-vs-phase-type-nucleosome-free.md)
 - 2026-11-10: [GM12878 Fiber-seq TF footprints — CTCF and NRF1 footprint strongly, the E-box and CRE weakly, most ChIP'd TFs not at all; m6A blind spots fake footprints](2026-11-10/gm12878-fiberseq-tf-footprint-screen.md)
 - 2026-11-06: [No evidence of TF dissociation in partially protected motifs; CTCF partial protection is site-fixed, OCT4/NF-Y lack the calls](2026-11-06/partial-motif-protection-and-dissociation.md)
