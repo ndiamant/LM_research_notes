@@ -136,6 +136,16 @@ need a minimum-fraction rule. Scripts:
 [plot_reads_by_coverage.py](fiberseq-figwig-unet-vs-cnn/scripts/plot_reads_by_coverage.py),
 [kept_windows_at_75.py](fiberseq-figwig-unet-vs-cnn/scripts/kept_windows_at_75.py).
 
+# Update 2026-11-12
+
+The 16 kb pilot planned under "Longer context" ran: see
+[16 kb pilot and labelling efficiency](../2026-11-12/fiberseq-16kb-pilot-labelling-efficiency.md).
+On the same central 1 kb sites it is 4.1% better than this note's 2 kb model, all from
+reading the rest of each molecule; its generated reads lack about half the molecule-wide
+(labelling) variance, which led to a design for modelling labelling efficiency and enzyme
+bias explicitly. The 75% rule there replaced the "nearly every window up to 8 kb" plan with
+16 kb reads and 1,024 bp DNA flanks.
+
 # Related Notes
 
 - [Fiber-seq GM12878 data preparation](../2026-10-05/fiberseq-gm12878-data-preparation.md):
