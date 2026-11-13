@@ -181,6 +181,32 @@ later, a footprint the corrected baseline misses.*
   - It shares the emission form with the corrected models, so agreement shows consistency, not
     truth.
 
+## Kernel width and the segment alternative (ε = 0.02)
+
+The ±7 bp kernel was compared with ±15 bp and with a segment version. The segment version takes
+the sigmoid of the summed per-call LLR over the motif ±3 bp and over each 10-30 bp flank, so it
+has no width parameter (`KERNEL_MODE=segment`).
+
+| TF | kernel AUPRC ±7 / ±15 / segment 0.95-0.05 | confident-footprint ratio bound / unbound, same order |
+|---|---|---|
+| CTCF | 0.791 / 0.780 / 0.811 | 37× / 58× / 28× |
+| NRF1 | 0.649 / 0.583 / 0.636 | 13× / 13× / 13× |
+| USF2 | 0.555 / 0.494 / 0.558 | 3.8× / 6.1× / 4.0× |
+| CREM | 0.675 / 0.532 / 0.608 | 7.0× / 3.6× / 3.5× |
+| RFX5 | 0.385 / 0.377 / 0.367 | 5.9× / 2.4× / 4.4× |
+
+- **±15 bp blurs small footprints:** NRF1 and CREM lose about half their confident footprint reads.
+- **The segment version needs stricter thresholds** (0.95 / 0.05) to match ±7's specificity at the
+  default 0.8 / 0.2. Summed segment LLRs are more extreme than averaged kernel values.
+- **Neither ±7 nor segment is better overall.** Segment wins on CTCF; ±7 wins on CREM, the shortest
+  motif (10 bp).
+
+**Decision:** ±7 bp is the definition, matching the profile plots, and the segment version is
+reported as a sensitivity check. All conclusions agree across the three.
+
+Outputs: `kernel_ref/specificity_eps002_{k15,segment,segment095}/` (Slurm 52216959, 52216963,
+52218269; `KERNEL_MODE`, `KERNEL_CONF`, `SKIP_OFFMOTIF=1`).
+
 ## Command provenance
 
 ```bash
