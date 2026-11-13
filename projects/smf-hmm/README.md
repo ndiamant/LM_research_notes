@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-13: [No real 80-120 bp nucleosome population; edges are wide (~35 bp) and roughly exponential; core methylation scales with efficiency (ε ≈ 0.003)](2026-11-13/fiber-nucleosome-lengths-and-edges.md)
 - 2026-11-13: [Bias-corrected phase-type loses on the ChIP AUROCs but is the better state caller — new specificity metrics (accessibility-matched AUPRC, off-motif TF calls) and a model-free debiased kernel reference](2026-11-13/fiber-specificity-metrics-debiased-kernel.md)
 - 2026-11-13: [Molecule-efficiency cuts — drop the bottom ~5% (SMFNet's 2% background-rate rule), no high cap](2026-11-13/fiber-molecule-efficiency-cuts.md)
 - 2026-11-12: [Labelling-efficiency (debiased) emissions — better within-bound ranking, worse bound-vs-unbound; rescues lightly labelled CTCF footprints, explains away lightly labelled CREM ones](2026-11-12/fiber-labelling-efficiency-emissions.md)
