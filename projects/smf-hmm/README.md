@@ -2,6 +2,8 @@
 
 ## Notes
 
+- 2026-11-12: [Labelling-efficiency (debiased) emissions — better within-bound ranking, worse bound-vs-unbound; rescues lightly labelled CTCF footprints, explains away lightly labelled CREM ones](2026-11-12/fiber-labelling-efficiency-emissions.md)
+- 2026-11-12: [Open spacers around TF calls plus a 3x lower TF target — first AG model to tie or beat phase-type on most footprinting-TF metrics, confirmed on train chromosomes](2026-11-12/fiber-tf-spacer-and-tf-target.md)
 - 2026-11-12: [Train-chromosome IDR benchmark — no memorization in neural posteriors, small prior-only train advantage, tighter CIs confirm phase-type's lead](2026-11-12/fiber-train-vs-val-chip-benchmark.md)
 - 2026-11-12: [AG prior with phase-type states and a 40 bp TF cap — the prior chains capped TFs through short open gaps; worst at full prior, matches phase-type with the prior off](2026-11-12/fiber-ag-phase-type-structure-run.md)
 - 2026-11-12: [Per-read m6A rate — reads above ~12% carry less binding information and shift state usage; 8-12% are as good as 2-8%; a strict 2-8% filter is a poor trade](2026-11-12/fiber-read-m6a-rate-evaluation.md)
