@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-13: [16 kb spec run (mixed lengths, strong jitter, 10% background, labelling efficiency, emission head): 5-6% worse than the pilot on the same reads; the emission head saturated e at 1 and its fixed epsilon floor overpredicts m6A on protected DNA](2026-11-13/fiberseq-16kb-spec-run-emission-head.md)
 - 2026-11-12: [16 kb Fiber-seq pilot: gains come from reading the rest of the molecule; generated reads lack half the molecule-wide labelling variance; CTCF pairs co-vary beyond labelling; design for efficiency and enzyme-bias modelling](2026-11-12/fiberseq-16kb-pilot-labelling-efficiency.md)
 - 2026-11-12: [Per-molecule m6A rate in GM12878 Fiber-seq (median 0.087, none above 0.95), no read-level methylation filter in our pipeline, and Bubb et al. 2026's recommended 2-8% range (only 40% of our molecules fall in it)](2026-11-12/fiberseq-per-read-m6a-rate.md)
 - 2026-11-11: [GM12878 Fiber-seq through the figwig loader: the AlphaGenome dilated U-Net beats the original CNN on every sample metric (~30% smaller gap to the ceiling, val loss 0.17905 vs 0.17971) and trains 2.9x faster](2026-11-11/fiberseq-figwig-unet-vs-cnn.md)
