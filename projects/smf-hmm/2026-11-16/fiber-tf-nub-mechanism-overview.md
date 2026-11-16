@@ -27,7 +27,7 @@ suspiciously often in low-efficiency stretches, and many look like histones spli
 
 | hypothesis | verdict | note |
 |---|---|---|
-| "Very short histones" violate the 147 bp minimum | **No: plot artifact.** Every sampled interior histone is 147 bp; argmax-of-marginals backgrounds make short histone patches where histone and other_long + TF compete | [short histone](fiber-short-histone-plot-artifact.md) |
+| "Very short histones" violate the 147 bp minimum | **No: plot artifact of my ad hoc panel scripts** (argmax-of-marginals background; the plot CLI uses Viterbi). Every sampled interior histone is 147 bp | [short histone](fiber-short-histone-plot-artifact.md) |
 | Insufficient m6A bias correction in low-efficiency stretches | **Largely refuted.** Held-out calls are calibrated within ±0.5 points across efficiency; without the prior, TF calls *fall* in poorly labelled DNA; the prior multiplies them 11× there. Long A/T runs are slightly under-corrected (minor) | [bias correction](fiber-tf-nubs-bias-correction.md) |
 | The prior's TF bumps are other TFs | **Mostly refuted.** No enrichment at footprinting-motif matches at strict or relaxed thresholds; prior-added calls fall on motifs below chance; a few real exceptions (e.g. an E-box) | [other TFs](fiber-tf-nubs-other-tf-motifs.md) |
 | Histones split into other_long + TF; prior puts TF at nucleosome edges | **Supported.** 72% of off-motif ×1 TF calls lie within 30 bp of a nucleosome (376 vs 54 per 1,000 reads without the prior); mostly 8 bp nubs 11-30 bp beyond a 147 bp histone; prior TF rises with nucleosome-edge density; noisy nucleosome-length stretches also fragment under the strict histone emission | [split nucleosomes](fiber-tf-nubs-split-nucleosomes-and-edges.md) |

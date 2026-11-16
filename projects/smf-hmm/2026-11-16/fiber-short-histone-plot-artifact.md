@@ -29,10 +29,15 @@ example about 6 bp at 300-306 in CTCF chr8:22,864,961 read 72. Is the minimum hi
   histone is exactly 147 bp (under prior ×1, ×0 and with TF forbidden).
 - **Where the short segment comes from.** In read 72 the posterior mixes two explanations of 282-430:
   a histone at 282-429 (P ≈ 0.44), or other_long at 298-398 plus TFs at 410-418 and 439-448
-  (P ≈ 0.55). The plotting helper colours each position by the group with the highest marginal, so it
-  shows "histone" for the few positions before other_long begins.
+  (P ≈ 0.55). The figures in question were made by my ad hoc panel scripts (gelu_panels.py and
+  relatives in fiber_eval_work), not by `smf_hmm.cli.plot`. Because the posterior files store only
+  group marginals, those scripts passed the per-position argmax of the marginals to
+  `plot_x_with_prior_panel` as the background path. That shows "histone" for the few positions before
+  other_long begins. `smf_hmm.cli.plot` passes the Viterbi path (`map_states_with_prior_terms`) and
+  cannot show this.
 
-**Recommendation.** Draw sampled or MAP paths, not argmax-of-marginals, when judging segment lengths. The
+**Recommendation.** Draw sampled or MAP paths, not argmax-of-marginals, when judging segment lengths, as
+`smf_hmm.cli.plot` already does. The
 new path-view figures (`plot_paths.py`) do this and label every segment's length.
 
 # Key Points
@@ -77,7 +82,8 @@ python $T/plot_paths.py
 
 # Open Questions
 
-- Should `smf_hmm.plot` default to a sampled/MAP background? (Not changed here.)
+- The ad hoc panel scripts should take a Viterbi or sampled path instead of argmax-of-marginals; this needs
+  paths, which the posterior files do not store.
 
 # Sources
 
