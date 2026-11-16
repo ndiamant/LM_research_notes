@@ -8,6 +8,7 @@ sources:
   - /scratch/users/diamant/fiber_eval_work/tf_mechanism/out/structure_gelu_s0.json (gpu_diagnostics.py part structure)
   - Prior output-layer biases from checkpoints: gelu_s0 (2026-11-15_fiber_gelu_head_sptf_nochain_B_seed0), collapsed (2026-11-14_fiber_ablation_sptf_nochain_seed2), ag_sptf (2026-11-12_..._ol001_spacer10_tf0067_kl10)
   - smf_hmm transition_modules.FixedBlockTransition (new tied_blocks option, uncommitted)
+  - /scratch/users/diamant/fiber_eval_work/tf_mechanism/{viterbi_lengths.py, viterbi_lengths.sbatch (Slurm 52534465 gelu_s0, 52534468 collapsed), plot_viterbi_lengths.py} -> viterbi/, figures/viterbi_lengths.png
 tags: [smf-hmm, fiberseq, transitions, spacer, prior, tf-duration]
 ---
 
@@ -62,6 +63,27 @@ tied (fix trials, overview note).
 
 - **Observed confident off-motif TF segments** (GELU ×1): 53% exactly 8 bp, against about 3% at ×0
   (split-nucleosome note figure).
+
+- **Viterbi segment lengths** (64.7k val reads, every 8th window; interior segments). The TF length
+  distribution is not bimodal: with the prior, an 8 bp spike dominates every context.
+
+  | GELU ×1, context | TF per 1,000 reads | exactly 8 bp | median | ≥ 20 bp |
+  |---|---|---|---|---|
+  | on benchmark motif | 225 | 48% | 9 bp | 19% |
+  | off-motif, other | 564 | 54% | 8 bp | 9% |
+  | off-motif, least-efficient quintile | 141 | 63% | 8 bp | 5% |
+
+  - Without the sequence prior (×0) Viterbi TFs are rare (77 per 1,000 reads) and almost all exactly
+    40 bp, the maximum duration; other_long likewise piles at its 100 bp maximum.
+  - The collapsed run's constant prior has the same 9th-position penalty and spikes at 8 bp.
+  - Interior histones are always exactly 147 bp.
+  - So the 8 bp mode marks the prior's duration shaping, applied to real footprints too, not spurious
+    calls specifically.
+
+![Viterbi segment lengths per state](fiber-tf-nubs-spacer-and-duration-shaping/viterbi_lengths.png)
+
+*Viterbi segment lengths per state. TF (bottom row): with the prior, an 8 bp spike in every context;
+without it, TFs sit at the 40 bp maximum.*
 
 # Details
 
