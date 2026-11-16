@@ -33,6 +33,7 @@ suspiciously often in low-efficiency stretches, and many look like histones spli
 | Histones split into other_long + TF; prior puts TF at nucleosome edges | **Partly.** 72% of off-motif ×1 TF calls lie within 30 bp of a nucleosome (376 vs 54 per 1,000 reads without the prior), but 62% of open positions do too, so adjacency is only mildly enriched; the prior's TF dips 10-20 bp outside nucleosome ends rather than peaking there. The A/T-rich nubs are a separate, mostly isolated group; mostly 8 bp nubs 11-30 bp beyond a 147 bp histone; prior TF rises with nucleosome-edge density; noisy nucleosome-length stretches also fragment under the strict histone emission | [split nucleosomes](fiber-tf-nubs-split-nucleosomes-and-edges.md) |
 | Deterministic spacer-TF-spacer transitions are favourable | **Refuted as stated** (an excursion costs about 8.5 nats). **Refined:** the prior's per-microstate potentials penalize TF position 9 (−1.3 nats), making exactly-8 bp TFs the preferred length (39% vs 9% under transitions alone) | [spacer and durations](fiber-tf-nubs-spacer-and-duration-shaping.md) |
 | Which part of the prior: TF placement or the open/histone landscape? (diagnostic) | **TF placement.** Flattening it along each window removes 86% of off-motif TF (14.4 → 2.0 per read-kb) with unchanged AUROC/AUPRC; flattening the landscape instead raises AUROC by 0.016 | [prior flattening](fiber-tf-nubs-prior-flattening.md) |
+| Why exactly 8 bp (with prior) and 40 bp (without)? | **Open-state overdispersion and duration caps.** Runs of consecutive protected calls in open DNA are up to 2.4× more frequent than the open emission predicts (not homopolymers); an 8 bp TF is the cheapest patch. The 40 bp spike is censoring at the TF cap | [open overdispersion](fiber-open-state-overdispersion.md) |
 | Under-methylated reads produce the TF calls | **Refuted for TF** (TF calls rise with labelling). Under-methylated reads over-use other_long (58 vs 25 per read-kb), and without a b_m term the model is miscalibrated by ±3-4 points | [under-methylated reads](fiber-tf-nubs-undermethylated-reads.md) |
 
 **Overall picture.**
@@ -63,9 +64,21 @@ Results:
   0.03 AUROC (0.709) with the same matched AUPRC (0.492).
 - **Both together:** off-motif 13.4 (scorecard), AUROC 0.713.
 
-Round 2 (submitted): prior occupancy KL 300 and 1000 with the GELU head. It targets the excess TF mass
-the prior keeps where reads cannot contradict it; the earlier KL 300-3000 runs used the collapsing
-ReLU head. Slurm 52521012 / 52521015, evaluation 52521017.
+**Round 2: a strong occupancy KL works with the GELU head.** Prior occupancy KL 300 and 1000, GELU design B,
+seed 0; Slurm 52521012 / 52521015, evaluation 52521017. Earlier KL 300-3000 runs used the collapsing ReLU
+head.
+- **KL 300 at the trained scale (×1), no post hoc scaling:**
+  - the best matched AUPRC of any model so far, 0.525 (old best spacer + TF/3 at ×0.5: 0.513);
+  - the best prior TF log-odds, mean 0.83 (NRF1 1.71, USF2 0.99, EBF1 0.48);
+  - ρ within bound sites 0.208;
+  - off-motif TF down from 14.4 to 6.2 per read-kb, the model-free level.
+- **KL 1000:** AUROC 0.757, matched AUPRC 0.523, off-motif TF 5.4, 88% of TF runs kernel-supported, and
+  the poorly-labelled vs well-labelled rate ratio down to 1.7.
+- **Remaining gaps:**
+  - raw AUROC still trails the constant prior (0.796), but accessible-read AUROC now exceeds it (0.666-0.669
+    vs 0.663);
+  - 25-30% of off-motif TF runs are still exactly 8 bp, which points to the open-state overdispersion
+    ([open overdispersion](fiber-open-state-overdispersion.md)).
 
 | model (prior ×1) | AUROC | matched AUPRC | off-motif TF / read-kb | prior log-odds (mean) | 8 bp share of off-motif TF runs | kernel-supported runs |
 |---|---|---|---|---|---|---|
@@ -75,6 +88,8 @@ ReLU head. Slurm 52521012 / 52521015, evaluation 52521017.
 | fix: both | 0.713 | 0.487 | 10.6 | 0.78 | 28% | 72% |
 | diagnostic: TF placement flattened | 0.740 | 0.483 | 2.0 | — | 22% | 90% |
 | collapsed (constant prior) | 0.796 | 0.496 | 6.5 | 0.00 | 17% | 83% |
+| **fix: KL 300** | 0.744 | **0.525** | 6.2 | **0.83** | 30% | 82% |
+| **fix: KL 1000** | 0.757 | 0.523 | 5.4 | 0.75 | 25% | 88% |
 
 (Off-motif TF per read-kb is from the specificity metric; the 8 bp share and kernel support are from
 nub_scorecard.py, every 4th window.)
@@ -131,7 +146,8 @@ python $T/edges/prior_vs_edges.py; python $T/plot_paths.py; python $T/make_figur
 
 # Open Questions
 
-- KL 300 / 1000 fix-trial results (to be added).
+- Seeds and test-chromosome confirmation of KL 300-1000; an open short-patch state and smooth length
+  distributions (open overdispersion note).
 - What are the protected remnants beside nucleosomes (chromatosome, partial unwrapping, real TFs at
   nucleosome borders)? Should they get their own state, or a longer/variable histone?
 
