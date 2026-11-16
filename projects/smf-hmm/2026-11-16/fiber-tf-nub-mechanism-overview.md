@@ -48,14 +48,36 @@ suspiciously often in low-efficiency stretches, and many look like histones spli
   - Held-out calls inside confident ones are mostly protected (91.5%), so they are short protected
     remnants (edge or partial-nucleosome protection, inferred) rather than accessible DNA.
 
-**Fix trials** (submitted; pending at the time of writing). GELU, design B, seed 0, about 3.5 h each:
-1. **tied:** TF and other_long chain states share one prior potential each (`transition.tied_blocks`),
-   so the prior cannot reshape durations.
-2. **eff_filter:** labelling-efficiency emission (ε 0.003) and the 2% molecule-rate filter, for
-   per-read labelling.
+**Fix trials, round 1: none removes the excess.** GELU, design B, seed 0, about 3.5-4 h each; Slurm 52509099/102/105,
+evaluation 52509108.
+1. **tied:** TF and other_long chain states share one prior potential each (`transition.tied_blocks`).
+2. **eff_filter:** labelling-efficiency emission (ε 0.003) and the 2% molecule-rate filter.
 3. **tied_eff_filter:** both.
 
-Evaluation: prior TF log-odds, IDR benchmark, matched AUPRC, off-motif TF, TF run lengths.
+Results:
+- **Tying barely changes the nubs.** The 8 bp share drops 32% → 26%, off-motif TF 18.2 → 17.2 per read-kb
+  (scorecard), with the same AUROC (0.742) and slightly better prior log-odds (mean 0.79 vs 0.74). The
+  duration cliff is a minor contributor; the nubs come mainly from TF placement (prior-flattening note).
+- **The efficiency emission trims off-motif TF** (14.1 scorecard; 11.3 per read-kb in the specificity
+  metric vs 14.4) and raises the on-motif share (0.30 vs 0.28). As with the ReLU head, it costs about
+  0.03 AUROC (0.709) with the same matched AUPRC (0.492).
+- **Both together:** off-motif 13.4 (scorecard), AUROC 0.713.
+
+Round 2 (submitted): prior occupancy KL 300 and 1000 with the GELU head. It targets the excess TF mass
+the prior keeps where reads cannot contradict it; the earlier KL 300-3000 runs used the collapsing
+ReLU head. Slurm 52521012 / 52521015, evaluation 52521017.
+
+| model (prior ×1) | AUROC | matched AUPRC | off-motif TF / read-kb | prior log-odds (mean) | 8 bp share of off-motif TF runs | kernel-supported runs |
+|---|---|---|---|---|---|---|
+| gelu_s0 | 0.741 | 0.488 | 14.4 | 0.74 | 32% | 59% |
+| fix: tied | 0.742 | 0.491 | 13.4 | 0.79 | 26% | 64% |
+| fix: efficiency + filter | 0.709 | 0.492 | 11.3 | 0.72 | 32% | 66% |
+| fix: both | 0.713 | 0.487 | 10.6 | 0.78 | 28% | 72% |
+| diagnostic: TF placement flattened | 0.740 | 0.483 | 2.0 | — | 22% | 90% |
+| collapsed (constant prior) | 0.796 | 0.496 | 6.5 | 0.00 | 17% | 83% |
+
+(Off-motif TF per read-kb is from the specificity metric; the 8 bp share and kernel support are from
+nub_scorecard.py, every 4th window.)
 
 # Key Points
 
@@ -109,7 +131,7 @@ python $T/edges/prior_vs_edges.py; python $T/plot_paths.py; python $T/make_figur
 
 # Open Questions
 
-- Fix-trial results (to be added).
+- KL 300 / 1000 fix-trial results (to be added).
 - What are the protected remnants beside nucleosomes (chromatosome, partial unwrapping, real TFs at
   nucleosome borders)? Should they get their own state, or a longer/variable histone?
 
