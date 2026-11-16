@@ -8,6 +8,7 @@
 - 2026-11-16: [Are the prior's TF bumps other TFs? Mostly not: no footprinting-motif enrichment](2026-11-16/fiber-tf-nubs-other-tf-motifs.md)
 - 2026-11-16: [Split nucleosomes and TF at nucleosome edges: supported; the prior adds 8 bp nubs beside nucleosomes](2026-11-16/fiber-tf-nubs-split-nucleosomes-and-edges.md)
 - 2026-11-16: [Spacer transitions are not favourable; the prior's per-microstate potentials make 8 bp TFs the preferred length](2026-11-16/fiber-tf-nubs-spacer-and-duration-shaping.md)
+- 2026-11-16: [Prior flattening diagnostic: the prior's TF placement makes 86% of off-motif TF calls; its landscape costs AUROC](2026-11-16/fiber-tf-nubs-prior-flattening.md)
 - 2026-11-16: [Under-methylated reads do not drive TF calls; they over-use other_long, and per-read labelling is miscalibrated](2026-11-16/fiber-tf-nubs-undermethylated-reads.md)
 - 2026-11-15: [The AG prior head's ReLU conv stack dies (seed-2 replicate and KL 3000 collapsed to constant priors); a residual GELU head fixes it (3 seeds, seed SD 0.02) — but a TF-informative prior lowers posterior ChIP AUROC vs a constant one](2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md)
 - 2026-11-14: [Prior TF log-odds is the metric we were missing — spacers sharpened the AG prior; labelling efficiency, dropping other_long and KL 3000 degraded it; keep no-chaining, bring back a rare other_long](2026-11-14/fiber-prior-tf-log-odds-and-design-takeaways.md)
