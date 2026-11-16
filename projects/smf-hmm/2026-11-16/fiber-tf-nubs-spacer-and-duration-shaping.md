@@ -94,6 +94,21 @@ without it, TFs sit at the 40 bp maximum.*
 - **Collapsed constant prior (n = 9,597):** 46% at 8 bp.
 - **Least-efficient quintile without the prior:** only 28 segments.
 
+![Viterbi segment lengths, KL 10 vs 300 vs 1000](fiber-tf-nubs-spacer-and-duration-shaping/viterbi_lengths_kl_proportion.png)
+
+*Stronger occupancy KL (GELU head, prior ×1).*
+
+| prior KL | TF segments per 1,000 reads | exactly 8 bp | on-motif exactly 8 bp | on-motif ≥ 20 bp | other_long exactly 100 bp |
+|---|---|---|---|---|---|
+| 10 | 931 | 54% | 48% | 19% | 22% |
+| 300 | 338 | 40% | 29% | 31% | 58% |
+| 1000 | 246 | 28% | 18% | 42% | 63% |
+
+- The 8 bp spike shrinks but remains off-motif (31-51%).
+- With KL 1000, on-motif TFs show a 20-35 bp hump plus a 10% spike at the 40 bp cap.
+- other_long piles at its 100 bp maximum: most of it holds 100-146 bp protected stretches that the
+  147 bp histone cannot take (censoring).
+
 # Details
 
 - **Potentials.** Each potential is the output-layer bias minus the open state's bias. Spacer states
