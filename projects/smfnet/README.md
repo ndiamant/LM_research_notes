@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-16: [Long-range evaluation suite for 16 kb models (CRE pairs, short range, labelling spread, position): noise vs block masking calibration fix, split-half ceilings (Spearman <= 0.33), flat checkpoint scan; short batches cut the 16 kb model's short-range gap from +2.7% to +0.3% at no long-range cost](2026-11-16/long-range-evaluation-suite.md)
 - 2026-11-15: [Additive emission head: -0.83% val loss at 2 kb (-0.19% at 16 kb), generated reads track b_m, Muon+EMA best; debiased TF footprints; the 16 kb model's central-1 kb edge comes only from the rest of the read; CTCF pairs co-vary with no orientation dependence in the model and observed reads](2026-11-15/fiberseq-additive-emission-head.md)
 - 2026-11-13: [16 kb spec run (mixed lengths, strong jitter, 10% background, labelling efficiency, emission head): 5-6% worse than the pilot on the same reads; the emission head saturated e at 1 and its fixed epsilon floor overpredicts m6A on protected DNA](2026-11-13/fiberseq-16kb-spec-run-emission-head.md)
 - 2026-11-12: [16 kb Fiber-seq pilot: gains come from reading the rest of the molecule; generated reads lack half the molecule-wide labelling variance; CTCF pairs co-vary beyond labelling; design for efficiency and enzyme-bias modelling](2026-11-12/fiberseq-16kb-pilot-labelling-efficiency.md)
