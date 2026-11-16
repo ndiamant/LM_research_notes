@@ -6,7 +6,7 @@ agent: Claude Code
 status: draft
 sources:
   - /scratch/users/diamant/fiber_eval_work/prior_tf_bumps/{bias_vs_bumps.py, efficiency_tracking.py, homopolymer_test.py, bias_vs_bumps_lib.py} -> kmers_at_peaks.tsv, efficiency_bins.tsv, efficiency_tracking.tsv, homopolymer_by_length.tsv, summary.txt
-  - /scratch/users/diamant/fiber_eval_work/tf_mechanism/{gpu_diagnostics.py (parts reads, heldout; Slurm 52505759, 52505761), causal_chain.py, heldout_calibration.py} -> causal_chain.tsv, heldout/*.tsv
+  - /scratch/users/diamant/fiber_eval_work/tf_mechanism/{gpu_diagnostics.py (parts reads, heldout; Slurm 52505759, 52505761), causal_chain.py, heldout_calibration.py, remnants_and_gradient.py} -> causal_chain.tsv, heldout/*.tsv, gradient.tsv
   - Bias table /scratch/users/diamant/fiber_eval_work/tf_screen/bias_table_chr8_chr20.npz; model context offsets from the gelu_s0 checkpoint
   - Models: gelu_s0 = GELU-head ablation B seed 0 (no labelling efficiency; additive ±3 bp context offsets); collapsed = ReLU ablation B seed 2 (constant prior)
 tags: [smf-hmm, fiberseq, m6a-bias, calibration, prior, low-efficiency, homopolymer]
@@ -38,6 +38,12 @@ mostly A/T tracts.
    anyway; held-out protection there is under-predicted by only 0.3-0.5 points. Real but minor.
 5. **Labelling-efficiency emission.** It reduces, but does not remove, the prior's efficiency tracking
    (per-window Spearman −0.26 to −0.29 vs −0.31 to −0.33 for additive-offset models).
+
+6. **The prior is unopposed there.** Mean posterior P(TF) exceeds the prior's by only 5-9% in every
+   efficiency decile; in the lowest decile it is 0.0405 vs 0.0370. The maximum-likelihood gradient on the
+   TF potential, (posterior − prior) occupancy, is about the same small value everywhere. So the reads
+   neither pull the prior's TF up nor push it down in poorly labelled DNA, and the 4% posterior TF there
+   is essentially the prior's own.
 
 **Interpretation (inferred).** The prior learned "TF on poorly labelled, A/T-rich sequence" and the
 reads there are too uninformative to contradict it. Possible routes:

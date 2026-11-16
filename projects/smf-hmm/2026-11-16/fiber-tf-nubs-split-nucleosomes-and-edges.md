@@ -8,6 +8,7 @@ sources:
   - /scratch/users/diamant/fiber_eval_work/tf_mechanism/gpu_diagnostics.py (parts synthetic, examples, reads; Slurm 52505020/21, 52505759/61) -> out/
   - /scratch/users/diamant/fiber_eval_work/tf_mechanism/{segments.py, heldout_calibration.py, plot_paths.py} -> segments/, heldout/, paths/
   - /scratch/users/diamant/fiber_eval_work/tf_mechanism/edges/prior_vs_edges.py -> edges/summary.txt
+  - /scratch/users/diamant/fiber_eval_work/tf_mechanism/remnants_and_gradient.py -> remnants.tsv, gradient.tsv
   - User observations, 2026-11-16 (CTCF chr8 read 72, SPI1 chr8 reads 142 and 79, SPI1 chr20 read 39)
 tags: [smf-hmm, fiberseq, nucleosome, tf-calls, prior, other-long, histone-edges]
 ---
@@ -56,11 +57,23 @@ fragment nucleosomes.
      396-432. That is a 148 bp protected run (kernel) whose only break is a cluster of m6A calls at
      385-395.
 
+7. **The reads show no excess of short protected remnants beside nucleosomes.** In the model-free kernel,
+   open-flanked 8-40 bp protected runs occur per kb of accessible DNA at:
+   - 1.64 when 11-30 bp from a nucleosome end in the same read;
+   - 1.74 at 31-80 bp;
+   - 1.67 farther away.
+
+   The model's 7× excess of TF beside nucleosomes therefore has no counterpart at kernel resolution.
+   Caveat: the ±7 bp kernel may merge a remnant within about 15 bp of a nucleosome into the nucleosome
+   run, hiding the closest ones.
+
 **Interpretation (inferred).** Real nucleosome footprints are not a fixed 147 bp of uniform protection.
 Shortened ones (on heavily labelled reads), longer ones (linker histone / chromatosome-like ~167 bp),
 partly unwrapped ones and ones with internal m6A all leave short protected remnants beside a 147 bp
-histone. The TF state absorbs those remnants, and the AG prior has learned where they occur (nucleosome
-borders, A/T-rich sequence) and makes them cheap.
+histone, and the TF state can absorb those remnants. But item 7 shows no excess of such remnants beside
+nucleosomes in the reads at kernel resolution. So most of the prior-added nubs beside nucleosomes reflect
+the prior's learned placement (nucleosome borders, A/T-rich sequence) rather than a data feature, while the
+confident ones (P > 0.8, 91.5% held-out protection) are real protection.
 
 # Key Points
 
