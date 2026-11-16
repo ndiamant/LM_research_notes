@@ -2,7 +2,7 @@
 
 ## Notes
 
-- 2026-11-15: [The AG prior head's ReLU conv stack dies (seed-2 replicate and KL 3000 collapsed to constant priors); prior ablation confounded; head replaced with residual GELU blocks](2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md)
+- 2026-11-15: [The AG prior head's ReLU conv stack dies (seed-2 replicate and KL 3000 collapsed to constant priors); a residual GELU head fixes it (3 seeds, seed SD 0.02) — but a TF-informative prior lowers posterior ChIP AUROC vs a constant one](2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md)
 - 2026-11-14: [Prior TF log-odds is the metric we were missing — spacers sharpened the AG prior; labelling efficiency, dropping other_long and KL 3000 degraded it; keep no-chaining, bring back a rare other_long](2026-11-14/fiber-prior-tf-log-odds-and-design-takeaways.md)
 - 2026-11-13: [Without other_long, TF chains replace it; a stronger prior KL pins the prior but not the posterior; forbidding TF chaining recovers most of the loss; AG ≈ constant prior](2026-11-13/fiber-no-other-long-tf-chaining.md)
 - 2026-11-13: [No real 80-120 bp nucleosome population; edges are wide (~35 bp) and roughly exponential; core methylation scales with efficiency (ε ≈ 0.003)](2026-11-13/fiber-nucleosome-lengths-and-edges.md)

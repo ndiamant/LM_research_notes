@@ -1,5 +1,5 @@
 ---
-title: The AG prior head's ReLU conv stack dies — a seed-2 replicate and the KL 3000 run collapsed to constant priors, and most units are dead in every run; one-change ablation of the prior degradation is confounded by this, so the head was replaced with AlphaGenome-style residual GELU blocks
+title: The AG prior head's ReLU conv stack dies (a seed-2 replicate and KL 3000 collapsed to constant priors; most units dead in every run), confounding the prior ablation; a residual GELU head fixes it (3 seeds, no collapse, seed SD 0.02) — but a TF-informative prior lowers posterior ChIP AUROC vs a constant one
 date: 2026-11-15
 project: smf-hmm
 agent: Claude Code
@@ -9,7 +9,7 @@ sources:
   - Outputs fiber_eval_work/{prior_log_odds/val_ablation_priors.tsv, idr_summary_abl_val.tsv, kernel_ref/specificity_abl/, tf_run_lengths_abl_val.txt}
   - Collapse diagnostic fiber_eval_work/prior_collapse/{dead_units.py, dead_units.sbatch} (Slurm 52447237 and a second run over earlier AG runs); wandb local history run-20261114_160520-hwu6lt7p (B) and run-20261114_160516-kw9g1exl (seed 2)
   - smf_hmm prior_architectures.py (GeluConvBlock, residual trunk), train.py (prior_potential_sd metric), checkpointing.py — uncommitted at time of writing
-  - GELU-head runs /scratch/users/diamant/2026-11-15_fiber_gelu_head_sptf_nochain_B_seed{0,1,2}_alphagenome_bf16 (Slurm 52468214/18/22; evaluation 52468241) — still training when written
+  - GELU-head runs /scratch/users/diamant/2026-11-15_fiber_gelu_head_sptf_nochain_B_seed{0,1,2}_alphagenome_bf16 (Slurm 52468214/18/22; evaluation 52468241); outputs fiber_eval_work/{prior_log_odds/val_gelu_priors.tsv, idr_summary_gelu_val.tsv, kernel_ref/specificity_gelu/, tf_run_lengths_gelu_val.txt}
 tags: [smf-hmm, fiberseq, gm12878, alphagenome, prior, dead-relu, ablation, prior-log-odds, architecture]
 ---
 
@@ -55,8 +55,25 @@ So the per-TF differences between single runs are confounded by how much of the 
 
 **Change made** (user decision): the ReLU stack was replaced by AlphaGenome-style pre-activation
 residual blocks, h + conv(gelu(RMSNorm(h))), in both the AG and CNN priors. A per-epoch
-`prior_potential_sd/<group>` metric now flags a collapsed (constant) prior. Three seeds of B with the
-new head were submitted; results are pending.
+`prior_potential_sd/<group>` metric now flags a collapsed (constant) prior.
+
+**GELU-head results** (added after the runs finished): three seeds of B.
+- **No collapse:** mean prior log-odds 0.74 / 0.71 / 0.71, the same quality as the surviving ReLU B
+  (0.74).
+- **Reproducible:**
+  - the seed-to-seed SD of mean log-odds is 0.019;
+  - per TF it is 0.02-0.04, except CTCF (0.09) and RFX5 (0.11);
+  - posterior AUROC is 0.768-0.769 and matched AUPRC 0.514-0.515 across seeds.
+  - So per-TF prior differences of about 0.1 or more between designs are now readable, given two or
+    more seeds.
+- **The sequence prior lowers the posterior ChIP benchmark.**
+  - All three healthy GELU priors give posterior AUROC 0.769, against 0.790 for the collapsed (constant)
+    seed-2 prior: worse for YY1, PAX5, NRF1 and CREM, never better.
+  - At full prior strength (×1) AUROC falls further, to 0.741, and off-motif TF more than doubles
+    (14.4 vs 6.0 per read-kb).
+  - The seed noise is about 0.001, so this is not chance.
+  - The prior ranks bound above unbound motifs (prior-only AUROC 0.72), yet adding it to the reads
+    hurts. Why is unresolved.
 
 # Key Points
 
@@ -99,6 +116,30 @@ every position; "spread" = SD of the TF potentials across positions):
 - at step 1783 (epoch 3.8) prior entropy drops 4.35 → 3.82 in one step;
 - during epoch 5, validation loss rises (66.0 → 67.0) while B's keeps falling;
 - the loss is frozen at 64.26 from about epoch 20 (B reaches 62.58).
+
+**GELU head, three seeds of B** (Slurm 52468214/18/22, evaluation 52468241): prior TF log-odds
+
+| prior | CTCF | NRF1 | USF2 | CREM | YY1 | SPI1 | RFX5 | PAX5 | EBF1 | mean | prior-only AUROC (mean) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `ag_sptf` (ReLU) | 2.02 | 1.55 | 0.79 | 0.60 | 0.49 | 0.48 | 0.43 | 0.42 | 0.40 | 0.80 | 0.76 |
+| B (ReLU) | 1.83 | 1.54 | 0.78 | 0.58 | 0.36 | 0.44 | 0.45 | 0.34 | 0.29 | 0.74 | 0.73 |
+| B seed 2 (ReLU, collapsed) | −0.02 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.46 |
+| GELU seed 0 | 1.84 | 1.40 | 0.65 | 0.77 | 0.27 | 0.48 | 0.57 | 0.38 | 0.33 | 0.74 | 0.72 |
+| GELU seed 1 | 1.67 | 1.41 | 0.68 | 0.80 | 0.23 | 0.45 | 0.49 | 0.36 | 0.32 | 0.71 | 0.72 |
+| GELU seed 2 | 1.70 | 1.37 | 0.73 | 0.82 | 0.31 | 0.48 | 0.35 | 0.34 | 0.29 | 0.71 | 0.72 |
+| GELU seed SD | 0.09 | 0.02 | 0.04 | 0.03 | 0.04 | 0.02 | 0.11 | 0.02 | 0.02 | 0.02 | 0.004 |
+
+**GELU head, posterior benchmark** (means over 9 TFs):
+
+| model | AUROC | AUROC, accessible reads | ρ within bound | matched AUPRC | off-motif TF / read-kb |
+|---|---|---|---|---|---|
+| GELU seeds 0/1/2, prior ×0.5 | 0.769 / 0.768 / 0.769 | 0.672 / 0.671 / 0.673 | 0.19 | 0.514 / 0.514 / 0.515 | 6.0 |
+| GELU seeds 0/1/2, prior ×1 | 0.741 / 0.738 / 0.743 | 0.649 / 0.646 / 0.649 | 0.12 | 0.488-0.492 | 14.4 |
+| B (ReLU), prior ×0.5 | 0.773 | 0.672 | 0.19 | 0.514 | 5.9 |
+| B seed 2 (constant prior), prior ×0.5 | **0.790** | 0.667 | 0.20 | 0.508 | **4.8** |
+
+TF run lengths at ×0.5 are the same for the GELU seeds and ReLU B: median 12 bp, 3% of TF bases in runs
+≥ 35 bp, no chains.
 
 # Details
 
@@ -175,12 +216,18 @@ figure was resized and quantized with Pillow.
 
 # Open Questions
 
-- **Does the GELU head fix it?** It should never collapse, and seed-to-seed log-odds noise should be
-  small enough to read the ablation (seeds 0-2 pending, evaluation 52468241).
-- **Does a healthy head make the sequence prior matter for the posterior?** The collapsed model scoring
-  best suggests the posterior benchmark may not reward a TF-informative prior.
-- **Ablation rerun:** once noise is known, rerun the ablation variants with the GELU head and
-  multiple seeds.
+- **Why does a TF-informative sequence prior lower the posterior ChIP AUROC** (0.769 healthy vs 0.790
+  constant, reproducible across seeds)? Candidates (untested):
+  - the prior's open/histone landscape pulls footprints at bound sites toward open;
+  - prior TF mass near but off the motif;
+  - the benchmark rewards something the prior works against.
+
+  A sequence-free (constant-prior) version of B, with identical emissions and transitions, would make
+  the comparison exact.
+- **Ablation rerun:** rerun the variants with the GELU head and two or more seeds. The seed SD (about
+  0.02 per TF, up to 0.1 for CTCF and RFX5) makes differences of about 0.1 readable. On single ReLU
+  seeds, the NRF1 drops from efficiency (−0.26) and the open-state change (−0.24) are the candidates
+  most likely to be real.
 
 # Sources
 
