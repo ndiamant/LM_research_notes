@@ -85,6 +85,15 @@ tied (fix trials, overview note).
 *Viterbi segment lengths per state. TF (bottom row): with the prior, an 8 bp spike in every context;
 without it, TFs sit at the 40 bp maximum.*
 
+![Viterbi segment lengths, proportions](fiber-tf-nubs-spacer-and-duration-shaping/viterbi_lengths_proportion.png)
+
+*The same as shares of each series (n in the legends).*
+- **Without the sequence prior (n = 4,969):** TF lengths form a broad 13-35 bp hump plus a 40 bp spike
+  (48%), with no 8 bp mode.
+- **With the AG prior (n = 60,187):** 54% at 8 bp.
+- **Collapsed constant prior (n = 9,597):** 46% at 8 bp.
+- **Least-efficient quintile without the prior:** only 28 segments.
+
 # Details
 
 - **Potentials.** Each potential is the output-layer bias minus the open state's bias. Spacer states
