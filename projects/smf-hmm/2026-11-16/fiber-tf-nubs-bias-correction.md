@@ -39,14 +39,21 @@ mostly A/T tracts.
 5. **Labelling-efficiency emission.** It reduces, but does not remove, the prior's efficiency tracking
    (per-window Spearman −0.26 to −0.29 vs −0.31 to −0.33 for additive-offset models).
 
-6. **The prior is unopposed there.** Mean posterior P(TF) exceeds the prior's by only 5-9% in every
-   efficiency decile; in the lowest decile it is 0.0405 vs 0.0370. The maximum-likelihood gradient on the
-   TF potential, (posterior − prior) occupancy, is about the same small value everywhere. So the reads
-   neither pull the prior's TF up nor push it down in poorly labelled DNA, and the 4% posterior TF there
-   is essentially the prior's own.
+6. **The prior is unconstrained there.** Mean posterior P(TF) is only 5-9% above the prior's in every
+   decile (lowest: 0.0405 vs 0.0370). That alone says nothing about constraint: at a maximum-likelihood
+   fixed point the average posterior matches the prior everywhere.
 
-**Interpretation (inferred).** The prior learned "TF on poorly labelled, A/T-rich sequence" and the
-reads there are too uninformative to contradict it. Possible routes:
+   The informative measure is how strongly the posterior follows the prior: ×1 vs ×0 TF calls differ 11×
+   in the worst-labelled decile but 2× in the best. In informative DNA the reads push back when the prior
+   raises TF where they show accessibility. In poorly labelled DNA raising the prior raises the posterior
+   almost one-for-one, so training has no restoring force there.
+
+   The prior's TF on such sequence is then set by extrapolation of the shared AlphaGenome features and
+   head weights from other sequence. The only remaining check is the occupancy KL, which limits total TF
+   mass but not where it sits.
+
+**Interpretation (inferred).** The prior learned "TF on poorly labelled, A/T-rich sequence", and the
+reads there are too uninformative for training to correct it. Possible routes:
 - weak positive evidence: kernel TF-length runs rise 1.6× there;
 - generalization of AG features from informative contexts.
 
