@@ -19,13 +19,28 @@ tags: [smf-hmm, fiberseq, nucleosome, tf-calls, prior, other-long, histone-edges
 the prior learns nucleosome-edge locations and puts TF mass there, or the emissions/transitions
 fragment nucleosomes.
 
-**Result: both happen, and the prior contribution dominates.**
+**Result: both happen and the prior contribution dominates, but adjacency to nucleosomes is only
+mildly enriched once its 62% baseline is counted (see item 1).**
 1. **Most prior-added TF calls sit next to nucleosomes.**
    - Per 1,000 reads, confident TF segments within 30 bp of a histone/other_long segment number 376
      with the prior (GELU ×1), against 54 for the same emissions without it (×0) and 125 for the
      constant-prior run.
    - 72% of off-benchmark ×1 TF segments are such adjacent calls. Their neighbour is a histone in 75%
      of cases, other_long in 25%.
+   - **Baseline (added 2026-11-16):** 62% of open positions in the same sampled paths are within 30 bp
+     of a histone/other_long segment, because linkers are short. Adjacency itself is therefore only
+     mildly enriched (1.1-1.3× for prior-added calls). Most of the 7× excess over ×0 is the prior adding
+     TF calls throughout accessible DNA, much of which happens to lie near a nucleosome.
+   - **By labelling efficiency:**
+
+     | efficiency quintile | prior-added calls beside a nucleosome-like segment | kernel support (×1) | exactly 8 bp (×1) |
+     |---|---|---|---|
+     | 1 (least efficient) | 69% | 39% | 66% |
+     | 2-4 | 78-80% | 62-68% | 45-49% |
+     | 5 (most efficient) | 63% | 57% | 58% |
+
+     The A/T-rich, poorly labelled nubs are a separate group: almost entirely prior-made (about 150× the
+     ×0 rate) and not especially nucleosome-associated.
 2. **They are minimum-length nubs.**
    - The median ×1 TF segment is 8 bp, the shortest the TF state allows; 53% of confident off-motif
      ×1 TF segments are exactly 8 bp. At ×0 the lengths peak around 14 bp.
