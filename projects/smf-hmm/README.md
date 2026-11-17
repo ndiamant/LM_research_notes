@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-16: [Ablation round 1 from KL 300: TF 15-40 best single change, tying helps, flank mildly positive; narrowing other_long and widening open do not help](2026-11-16/fiber-ablation-round1-tie-tf-length-histone-other-long-open.md)
 - 2026-11-16: [What causes spurious TF-length footprints? Mostly the AG prior adding 8 bp TF nubs beside nucleosomes and on poorly labelled sequence (overview of six hypotheses)](2026-11-16/fiber-tf-nub-mechanism-overview.md)
 - 2026-11-16: [The very short histone in posterior plots is an argmax-of-marginals artifact](2026-11-16/fiber-short-histone-plot-artifact.md)
 - 2026-11-16: [Insufficient bias correction? Largely refuted: emissions are calibrated; the prior creates TF calls in poorly labelled DNA](2026-11-16/fiber-tf-nubs-bias-correction.md)
