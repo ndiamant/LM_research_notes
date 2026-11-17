@@ -1,5 +1,5 @@
 ---
-title: Variable-length tapered nucleosome — 100-190 bp matches base AUROC, improves AUPRC, off-motif TF and prior log-odds, and removes most other_long (60% fewer, cap pile-up 40% → 9%); 100-147 only costs 0.02 AUROC; nucleosome lengths largely follow the duration prior
+title: Variable-length tapered nucleosome — 100-190 bp matches base AUROC, improves AUPRC, off-motif TF and prior log-odds, and removes most other_long (60% fewer, cap pile-up 40% → 9%); 100-147 costs 0.02 AUROC; nucleosome lengths largely follow the duration prior
 date: 2026-11-17
 project: smf-hmm
 agent: Claude Code
