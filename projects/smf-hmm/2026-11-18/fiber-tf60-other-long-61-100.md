@@ -92,6 +92,22 @@ protected patches. Seed 0, val chromosomes only, prior ×1.
 - **Learned emissions** were not checked for this run; the TF 15-60 run had TF 0.937 and other_long
   0.956.
 - **No smoke run.** The code was identical to the earlier runs.
+- **Visual check.** Per-read montages, comparing this run with TF 15-60 / other_long 40-100: 4 reads at
+  the strongest IDR-bound site per TF and val chromosome, for 8 TFs. They are in
+  `/scratch/users/diamant/gm12878_validation/ol61_vs_ol40_panels/montages/`, made with
+  `evaluation.tf_chip.plot_model_comparison`; reads were chosen from the new model.
+  - **Short patches move from other_long to TF everywhere.** Protected patches of about 35-60 bp that
+    the old model called other_long (posterior about 0.6-0.9, TF 0.2-0.4) are now called TF with
+    posterior about 0.9-1.0.
+  - **This happens at motifs and away from them.** Examples:
+    - on-motif: the CREM motif in chr20:57,398,498 read 8; the YY1 motif in chr8:22,245,102 read 96;
+    - off-motif: CREM read 23 (bp ~430-465) and read 11 (bp ~150-175); YY1 read 65 (bp ~380-420);
+      CTCF chr8:22,864,961 read 104 (bp ~100-130); NRF1 chr8:10,054,697 reads 97-98.
+  - **Length, not sequence, decides.** The prior's TF potential is near zero at these off-motif
+    patches.
+  - **So the off-motif TF rise is not only the motif-flank counting effect.** Off-motif 41-60 bp
+    patches become TF too, which likely explains the CREM and YY1 AUPRC loss (inferred from examples,
+    not quantified).
 
 ```bash
 S=/scratch/users/diamant; W=$S/fiber_eval_work; T=$W/tf_mechanism
