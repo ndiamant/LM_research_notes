@@ -18,7 +18,7 @@ tags: [smf-hmm, fiberseq, report, model-design, metrics]
 ## Status and conventions
 
 **Status.** This is a draft. Numbers are copied from the research notes and evaluation tables listed in
-[Sources](#sources). The latest model, TF 15-60 (`hist190_tf60`), is included. Comments in
+[Sources](#sources). The latest model, TF 15-60 with other_long 61-100 (`tf60_ol61`, 2026-11-18), is included. Comments in
 *[brackets]* mark editorial to-dos for the LaTeX version.
 
 **Conventions.**
@@ -83,7 +83,7 @@ The case for these metrics is in §2.4.
 
 ![Metric progression along the model lineage](fiberseq-model-report/metric_progression.png)
 
-*Along the main lineage, accessible-read AUROC, within-bound ρ, matched AUPRC and prior log-odds rise to or past phase-type (dashed), and off-motif TF falls to about an eighth of phase-type's; raw AUROC peaks with spacers + TF/3 and stays below phase-type. Made with `fiberseq-model-report/plot_metric_progression.py`.*
+*Along the main lineage, accessible-read AUROC, within-bound ρ, matched AUPRC and prior log-odds rise to or past phase-type (dashed), and off-motif TF falls to about a sixth of phase-type's (rising again in the last run); raw AUROC peaks in the last run (0.774) and stays below phase-type; AUPRC drops in the last run. Made with `fiberseq-model-report/plot_metric_progression.py`.*
 
 ---
 
@@ -234,6 +234,7 @@ AUROC and 0.02 log-odds (2026-11-15/16).]*
 | 16 | 11-17 | combined 13 + 14 + 15 (`r2_full`) | AUROC 0.764, AUPRC 0.528, off-motif 5.65, log-odds 1.01; each part contributes (leave-one-out) | [round 2](fiber-ablation-round2-full-model-leave-one-out.md) |
 | 17 | 11-17 | variable-length nucleosome, 100-190 bp: P(d) ∝ exp(−\|d − 147\|/15), 40-state exit tail, tied histone potentials | other_long held short nucleosomes (100 bp cap; spans 104-113 bp) and over-long ones (other_long at its minimum beside a histone; spans about 160-190 bp); result: AUROC 0.765, AUPRC 0.535, off-motif 4.78, log-odds 1.09, other_long 323 → 130 per 1,000 reads | [short other_long](fiber-short-other-long-calls.md); [variable nucleosome](fiber-variable-length-nucleosome.md) |
 | 18 | 11-17 | TF maximum 40 → 60 bp (`hist190_tf60`) | aimed at the isolated 41-60 bp other_long patches (27% on bound CTCF); result: AUROC 0.768, ρ within bound 0.232, AUPRC 0.538, off-motif 4.69, log-odds 1.08; but only 0.7% of TF calls exceed 40 bp (TF's zero-bias duration prior makes 41-59 bp 4-5× less likely than other_long's), so the gains likely come from removing the 40 bp cap's censoring | [TF 15-60](fiber-tf-15-60.md) |
+| 19 | 11-18 | other_long minimum 40 → 61 bp (`tf60_ol61`) | makes TF the only state for 41-60 bp: 9.1% of TF calls now exceed 40 bp, 59% of them on bound motifs (49% CTCF); AUROC 0.774, ρ within bound 0.246, log-odds 1.19 (CTCF 3.07), CTCF AUPRC 0.849; but mean AUPRC 0.520 (CREM 0.668 → 0.566, YY1 0.325 → 0.287), off-motif TF 4.69 → 6.12, and other_long piles at 61 bp (12%) | [TF 15-60 + other_long 61-100](../2026-11-18/fiber-tf60-other-long-61-100.md) |
 
 *[LaTeX: one short subsection per row, with its figure from §4.3.]*
 
@@ -377,35 +378,36 @@ checkpointing), 100 epochs, seed 0.
 | `r2_full` (11-17) | tie + TF 15-40 + flank | 0.764 | 0.681 | 0.780 | 0.213 | 0.528 | 5.65 | 1.01 |
 | histone 100-147 (11-17) | short nucleosomes only | 0.743 | 0.674 | 0.761 | 0.222 | 0.532 | 5.18 | 1.10 |
 | `hist100_190` (11-17) | variable nucleosome 100-190 | 0.765 | 0.687 | 0.781 | 0.215 | 0.535 | 4.78 | 1.09 |
-| **`hist190_tf60` (11-17)** | **TF 15-60** | **0.768** | **0.688** | **0.783** | **0.232** | **0.538** | **4.69** | **1.08** |
+| `hist190_tf60` (11-17) | TF 15-60 | 0.768 | 0.688 | 0.783 | 0.232 | 0.538 | 4.69 | 1.08 |
+| **`tf60_ol61` (11-18)** | **other_long 61-100** | **0.774** | **0.690** | **0.789** | **0.246** | 0.520 | 6.12 | **1.19** |
 
 ### 6.2 Per-TF AUROC, prior ×1
 
-| TF | phase-type | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` | `hist190_tf60` |
-|---|---|---|---|---|---|---|---|---|---|
-| CTCF | 0.884 | 0.840 | 0.850 | 0.876 | 0.862 | 0.866 | 0.868 | 0.861 | 0.865 |
-| NRF1 | 0.894 | 0.786 | 0.818 | 0.886 | 0.832 | 0.840 | 0.868 | 0.859 | 0.866 |
-| USF2 | 0.847 | 0.718 | 0.748 | 0.796 | 0.774 | 0.793 | 0.788 | 0.783 | 0.782 |
-| CREM | 0.844 | 0.736 | 0.744 | 0.803 | 0.770 | 0.740 | 0.825 | 0.808 | 0.803 |
-| RFX5 | 0.792 | 0.710 | 0.706 | 0.763 | 0.748 | 0.738 | 0.753 | 0.771 | 0.771 |
-| EBF1 | 0.719 | 0.678 | 0.682 | 0.725 | 0.706 | 0.734 | 0.731 | 0.729 | 0.727 |
-| PAX5 | 0.756 | 0.626 | 0.659 | 0.708 | 0.655 | 0.674 | 0.697 | 0.702 | 0.706 |
-| SPI1 | 0.820 | 0.673 | 0.689 | 0.745 | 0.721 | 0.722 | 0.746 | 0.753 | 0.755 |
-| YY1 | 0.726 | 0.537 | 0.552 | 0.645 | 0.599 | 0.590 | 0.599 | 0.617 | 0.633 |
+| TF | phase-type | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` | `hist190_tf60` | `tf60_ol61` |
+|---|---|---|---|---|---|---|---|---|---|---|
+| CTCF | 0.884 | 0.840 | 0.850 | 0.876 | 0.862 | 0.866 | 0.868 | 0.861 | 0.865 | 0.880 |
+| NRF1 | 0.894 | 0.786 | 0.818 | 0.886 | 0.832 | 0.840 | 0.868 | 0.859 | 0.866 | 0.877 |
+| USF2 | 0.847 | 0.718 | 0.748 | 0.796 | 0.774 | 0.793 | 0.788 | 0.783 | 0.782 | 0.785 |
+| CREM | 0.844 | 0.736 | 0.744 | 0.803 | 0.770 | 0.740 | 0.825 | 0.808 | 0.803 | 0.793 |
+| RFX5 | 0.792 | 0.710 | 0.706 | 0.763 | 0.748 | 0.738 | 0.753 | 0.771 | 0.771 | 0.766 |
+| EBF1 | 0.719 | 0.678 | 0.682 | 0.725 | 0.706 | 0.734 | 0.731 | 0.729 | 0.727 | 0.737 |
+| PAX5 | 0.756 | 0.626 | 0.659 | 0.708 | 0.655 | 0.674 | 0.697 | 0.702 | 0.706 | 0.731 |
+| SPI1 | 0.820 | 0.673 | 0.689 | 0.745 | 0.721 | 0.722 | 0.746 | 0.753 | 0.755 | 0.763 |
+| YY1 | 0.726 | 0.537 | 0.552 | 0.645 | 0.599 | 0.590 | 0.599 | 0.617 | 0.633 | 0.637 |
 
 ### 6.3 Per-TF prior TF log-odds
 
-| TF | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` | `hist190_tf60` |
-|---|---|---|---|---|---|---|---|---|
-| CTCF | 0.87 | 0.90 | 2.02 | 1.84 | 1.97 | 2.56 | 2.70 | 2.77 |
-| NRF1 | 0.85 | 1.11 | 1.55 | 1.40 | 1.71 | 1.68 | 1.81 | 2.05 |
-| USF2 | 0.30 | 0.42 | 0.79 | 0.65 | 0.99 | 1.08 | 1.26 | 1.04 |
-| CREM | 0.29 | 0.35 | 0.60 | 0.77 | 0.78 | 0.87 | 0.89 | 0.63 |
-| RFX5 | 0.32 | 0.22 | 0.43 | 0.57 | 0.43 | 0.75 | 0.85 | 0.86 |
-| EBF1 | 0.20 | 0.20 | 0.40 | 0.33 | 0.48 | 0.54 | 0.56 | 0.58 |
-| PAX5 | 0.20 | 0.21 | 0.42 | 0.38 | 0.35 | 0.57 | 0.51 | 0.51 |
-| SPI1 | 0.25 | 0.32 | 0.48 | 0.48 | 0.49 | 0.66 | 0.73 | 0.67 |
-| YY1 | 0.14 | 0.20 | 0.49 | 0.27 | 0.28 | 0.37 | 0.51 | 0.59 |
+| TF | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` | `hist190_tf60` | `tf60_ol61` |
+|---|---|---|---|---|---|---|---|---|---|
+| CTCF | 0.87 | 0.90 | 2.02 | 1.84 | 1.97 | 2.56 | 2.70 | 2.77 | 3.07 |
+| NRF1 | 0.85 | 1.11 | 1.55 | 1.40 | 1.71 | 1.68 | 1.81 | 2.05 | 1.95 |
+| USF2 | 0.30 | 0.42 | 0.79 | 0.65 | 0.99 | 1.08 | 1.26 | 1.04 | 1.28 |
+| CREM | 0.29 | 0.35 | 0.60 | 0.77 | 0.78 | 0.87 | 0.89 | 0.63 | 0.87 |
+| RFX5 | 0.32 | 0.22 | 0.43 | 0.57 | 0.43 | 0.75 | 0.85 | 0.86 | 0.96 |
+| EBF1 | 0.20 | 0.20 | 0.40 | 0.33 | 0.48 | 0.54 | 0.56 | 0.58 | 0.54 |
+| PAX5 | 0.20 | 0.21 | 0.42 | 0.38 | 0.35 | 0.57 | 0.51 | 0.51 | 0.62 |
+| SPI1 | 0.25 | 0.32 | 0.48 | 0.48 | 0.49 | 0.66 | 0.73 | 0.67 | 0.77 |
+| YY1 | 0.14 | 0.20 | 0.49 | 0.27 | 0.28 | 0.37 | 0.51 | 0.59 | 0.65 |
 
 ### 6.4 State-level diagnostics (Viterbi, every 8th val window)
 
@@ -415,6 +417,7 @@ checkpointing), 100 epochs, seed 0.
 | `r2_full` | 123 | 92% | 20% (15 bp) | 323 | 40% | 147 (fixed) |
 | `hist100_190` | 116 | 86% | 21% (15 bp) | 130 | 9% | median 142 (100-190) |
 | `hist190_tf60` | 107 | 86% | 17% (15 bp) | 126 | 9% | median 142 (100-190) |
+| `tf60_ol61` | 112 | 90% | 13% (15 bp) | 105 | 8% at 100; 12% at its 61 bp minimum | median 142 (100-190) |
 
 ### 6.5 Reading the progression
 *[Prose for LaTeX.]*
@@ -434,7 +437,7 @@ checkpointing), 100 epochs, seed 0.
 - **Nucleosome lengths follow the duration prior.** Viterbi median 142 vs a prior median of 147, with
   about the same spread. Options: a tighter scale (about 8 bp), or a "spike at 147 + broad tail"
   prior.
-- **TF 15-60** (`hist190_tf60`) gives small gains, but TF barely uses 41-60 bp. A flatter TF duration prior would be needed to move the CTCF-like patches out of other_long.
+- **TF 15-60 + other_long 61-100** (`tf60_ol61`) moves the CTCF-like 41-60 bp patches into TF and gives the best AUROC, ρ and prior so far, but costs matched AUPRC (CREM, YY1) and raises off-motif TF; other_long now piles at 61 bp.
 - **Removing other_long.** The remaining 61-99 bp other_long calls look like sub-nucleosomal particles,
   so a histone minimum of about 60-70 bp may let other_long go. That conflicts with a tight length
   prior.

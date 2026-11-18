@@ -21,7 +21,7 @@ W = Path("/scratch/users/diamant/fiber_eval_work")
 LINEAGE = [  # (model key, label)
     ("ag_kl10", "AG KL 10\n(11-10)"), ("ag_ol001", "other_long 1%\n(11-11)"), ("ag_sptf", "spacers +\nTF/3 (11-12)"),
     ("abl_B", "no chaining\n(11-14)"), ("gelu_s0", "GELU head\n(11-15)"), ("fix_kl300", "KL 300\n(11-16)"),
-    ("r2_full", "tie + TF 15-40\n+ flank (11-17)"), ("r3_hist100_190", "histone\n100-190"), ("r4_hist190_tf60", "TF 15-60"),
+    ("r2_full", "tie + TF 15-40\n+ flank (11-17)"), ("r3_hist100_190", "histone\n100-190"), ("r4_hist190_tf60", "TF 15-60"), ("r5_tf60_ol61", "other_long\n61-100 (11-18)"),
 ]
 BASELINE = "phase_type"
 
