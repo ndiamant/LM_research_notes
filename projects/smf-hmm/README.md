@@ -2,6 +2,7 @@
 
 ## Reports
 
+- [The GM12878 Fiber-seq HMM, component by component](2026-11-18/fiberseq-model-components.md) (concise report: what each component is and why)
 - [Building the GM12878 Fiber-seq HMM: components, evidence, and metrics](2026-11-17/fiberseq-model-report.md) (living draft, source for the PDF report)
 
 ## Notes
