@@ -57,7 +57,7 @@ out = Path(sys.argv[1])
 T.round(4).to_csv(out.with_suffix(".tsv"), sep="\t")
 
 INK, INK2, GRID, SURF, BLUE = "#0b0b0b", "#52514e", "#e6e6e3", "#fcfcfb", "#2a78d6"
-PANELS = [("auroc", "IDR AUROC"), ("auroc_access", "AUROC, accessible reads"), ("rho_bound", "ρ within bound sites"),
+PANELS = [("auroc", "IDR AUROC"), ("auroc_access", "AUROC within accessibility strata"), ("rho_bound", "ρ within bound sites"),
           ("auprc", "accessibility-matched AUPRC"), ("off_motif_kb", "off-motif TF per read-kb (lower is better)"),
           ("prior_log_odds", "prior TF log-odds (9-TF mean)")]
 x = np.arange(len(LINEAGE))

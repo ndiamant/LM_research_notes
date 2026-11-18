@@ -63,7 +63,7 @@ All are at prior ×1, with the phase-type baseline for reference.
 | metric | phase-type (baseline) | AG KL 10 | `ag_sptf` | current `hist100_190` |
 |---|---|---|---|---|
 | IDR AUROC | **0.809** | 0.700 | 0.772 | 0.765 |
-| AUROC, accessible reads | 0.685 | 0.629 | 0.663 | **0.687** |
+| AUROC within accessibility strata | 0.685 | 0.629 | 0.663 | **0.687** |
 | AUROC, protected reads | **0.826** | 0.744 | 0.790 | 0.781 |
 | ρ within bound sites | 0.165 | 0.111 | 0.169 | **0.215** |
 | accessibility-matched AUPRC | 0.485 | – | – | **0.535** |
@@ -74,7 +74,7 @@ All are at prior ×1, with the phase-type baseline for reference.
 (0.809), and the collapsed constant-prior model also scores higher (0.796). Those AUROCs reward
 over-calling TF: phase-type calls 38.6 off-motif TF per read-kb. With bias-corrected emissions it
 falls to 0.734. Our progress shows up as:
-- accessible-read AUROC and within-bound ranking;
+- accessibility-stratified AUROC and within-bound ranking;
 - precision at matched recall (AUPRC);
 - far fewer spurious calls (off-motif TF);
 - a sequence prior that separates bound from unbound motifs (prior log-odds).
@@ -83,7 +83,7 @@ The case for these metrics is in §2.4.
 
 ![Metric progression along the model lineage](fiberseq-model-report/metric_progression.png)
 
-*Along the main lineage, accessible-read AUROC, within-bound ρ, matched AUPRC and prior log-odds rise to or past phase-type (dashed), and off-motif TF falls to about a sixth of phase-type's (rising again in the last run); raw AUROC peaks in the last run (0.774) and stays below phase-type; AUPRC drops in the last run. Made with `fiberseq-model-report/plot_metric_progression.py`.*
+*Along the main lineage, accessibility-stratified AUROC, within-bound ρ, matched AUPRC and prior log-odds rise to or past phase-type (dashed), and off-motif TF falls to about a sixth of phase-type's (rising again in the last run); raw AUROC peaks in the last run (0.774) and stays below phase-type; AUPRC drops in the last run. Made with `fiberseq-model-report/plot_metric_progression.py`.*
 
 ---
 
@@ -142,11 +142,11 @@ The case for these metrics is in §2.4.
 | accessibility-controlled ρ, references | partial ρ given accessibility (±25 bp); accessibility / motif-score reference rows | 2026-11-04 (SMF) | the benchmark mostly measured prior plus accessibility |
 | protected-read metric | mean P(TF) over reads with a protected call in the motif | 2026-11-05 (SMF) | separate footprint evidence from accessibility |
 | P(TF+open) | nucleosome-free score | 2026-11-11 | neural models called bound but unprotected DNA open |
-| IDR AUROC (raw, accessible-read, protected-read), ρ within bound, paired bootstrap CIs | bound vs unbound AUROC; within-bound ranking | 2026-11-12 | ChIP-quantile labels sat in the noise mode; IDR labels are standard and untuned |
+| IDR AUROC (raw, within accessibility quintiles, protected-read), ρ within bound, paired bootstrap CIs | bound vs unbound AUROC of motif-mean P(TF); within-bound partial Spearman with ChIP given accessibility (definitions in the [component report](../2026-11-18/fiberseq-model-components.md#metric-definitions)) | 2026-11-12 | ChIP-quantile labels sat in the noise mode; IDR labels are standard and untuned |
 | train-chromosome replication | same benchmark on 5 train chromosomes | 2026-11-12 | more power; memorization check |
 | TF run / chain statistics | runs ≥ 35 bp; chains > 40, 60 or 100 bp | 2026-11-12 | detect TF chaining |
 | accessibility-matched AUPRC | strong bound sites (≥ median ChIP) vs accessibility-matched unbound sites, 3:1, 100 resamples | 2026-11-13 | the AUROCs reward over-calling |
-| off-motif TF per read-kb, on-motif share | TF-called bases more than 5 bp from benchmark motifs | 2026-11-13 | count spurious calls directly |
+| off-motif TF per read-kb, on-motif share | TF-called bases (P > 0.5) outside ±5 bp of any strong hit of 100 PWMs (91 footprint-screen + 9 benchmark motifs) | 2026-11-13 | count spurious calls directly |
 | debiased kernel P(bound) | model-free, ±7 bp, ε = 0.02, fit on train chromosomes | 2026-11-13 | model-free footprint reference (CTCF bound / unbound confident-footprint ratio 37×) |
 | prior TF log-odds, prior-only AUROC | logit(median prior P(TF) at bound motifs) − logit(median at unbound) | 2026-11-14 | the read-dominated posterior hid large prior changes, e.g. a collapsed prior still scored 0.709 AUROC; standing metric for every new model |
 | `prior_potential_sd/<group>`, seed SD | spread of prior potentials during training; spread across seed replicates | 2026-11-15 | detect a dead (constant) prior head |
@@ -357,7 +357,7 @@ checkpointing), 100 epochs, seed 0.
 
 *AUPRC and off-motif TF were not computed for models before 2026-11-13.*
 
-| model (date) | key change | AUROC | AUROC acc. | AUROC prot. | ρ bound | AUPRC | off-motif TF / kb | prior log-odds |
+| model (date) | key change | AUROC | AUROC strat. | AUROC prot. | ρ bound | AUPRC | off-motif TF / kb | prior log-odds |
 |---|---|---|---|---|---|---|---|---|
 | phase-type (baseline) | fixed phase-type HMM, no prior | 0.809 | 0.685 | 0.826 | 0.165 | 0.485 | 38.58 | – |
 | phase-type, efficiency-corrected | bias-corrected emissions | 0.734 | 0.636 | 0.758 | 0.162 | 0.469 | 17.29 | – |
@@ -428,7 +428,7 @@ checkpointing), 100 epochs, seed 0.
   - Off-motif TF per read-kb: 13.3 (`ag_nochain`) → 14.4 (GELU B) → 6.2 (KL 300) → 4.8 (`hist100_190`); phase-type 38.6.
   - Matched AUPRC: 0.475 (`ag_nochain`) → 0.525 (KL 300) → 0.535; phase-type 0.485.
 - **Prior quality** (mean log-odds) went 0.38 → 0.80 → 1.09, with CTCF at 2.70.
-- **Within-bound ranking** (ρ 0.111 → 0.215) and **accessible-read AUROC** (0.629 → 0.687) are now at
+- **Within-bound ranking** (ρ 0.111 → 0.215) and **accessibility-stratified AUROC** (0.629 → 0.687) are now at
   or above phase-type.
 
 ---
