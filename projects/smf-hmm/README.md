@@ -2,6 +2,7 @@
 
 ## Notes
 
+- 2026-11-17: [TF 15-60: small gains (ρ within bound 0.232) from removing the 40 bp cap; TF barely uses 41-60 bp because its duration prior favours other_long there](2026-11-17/fiber-tf-15-60.md)
 - 2026-11-17: [Variable-length nucleosome: 100-190 bp matches base AUROC, best AUPRC and off-motif TF, removes most other_long; 100-147 costs AUROC; lengths largely follow the duration prior](2026-11-17/fiber-variable-length-nucleosome.md)
 - 2026-11-17: [Short other_long calls: TF-like patches just over 40 bp and nucleosomes longer than 147 bp; the 100 bp cap holds short nucleosomes](2026-11-17/fiber-short-other-long-calls.md)
 - 2026-11-17: [Ablation round 2: full model (tie + TF 15-40 + flank) best on AUROC, prior log-odds and off-motif TF; AUPRC unchanged; other_long 50-90 re-piles at both ends](2026-11-17/fiber-ablation-round2-full-model-leave-one-out.md)
