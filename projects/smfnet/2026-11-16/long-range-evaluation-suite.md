@@ -277,6 +277,9 @@ The `.sbatch` files and the plot script are copied in
   jitter/short-batch implementation (with the failed mixture head).
 - [Inpainting](../2026-11-10/inpainting.md): Span-masking work relevant to the block-masking
   calibration issue.
+- [External validation with scATAC](../2026-11-18/long-range-external-validation-scatac.md)
+  (later): scATAC cell-level co-accessibility of these pairs, ±250 bp windows, a raw 50-epoch
+  run and a haplotype pilot; bears on the pilot's Spearman lead and the evaluation-set size.
 
 # Open Questions
 
@@ -284,8 +287,14 @@ The `.sbatch` files and the plot script are copied in
   change the pair metrics?
 - Why does the pilot (no b_m) lead on Spearman given raw r? Test with a non-linear labelling
   adjustment of the observed partial r, or by scoring the additive model at b_m = 0.
+  (2026-11-18: the lead does not transfer to scATAC, and a raw-diffusion run on the additive
+  data recipe shows it too, so it is probably labelling left in the partial r; see
+  [external validation](../2026-11-18/long-range-external-validation-scatac.md).)
 - A larger fixed evaluation set (test chromosomes, about 3× the pairs) would tighten AUROC
   and AUPRC, which 91 positives leave at about ±0.06 and ±0.03 between models.
+  (2026-11-18: the user does not want to use the test chromosomes; ±250 bp elements instead
+  give 152 positives and double the reliability on the val set; see
+  [external validation](../2026-11-18/long-range-external-validation-scatac.md).)
 - Matched-b_m generated reads overshoot raw co-accessibility (0.196 vs 0.162 at 0.5-1 kb).
   Why?
 - The pair metrics are flat over training. Would a longer schedule, or training that weights
