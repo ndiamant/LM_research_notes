@@ -81,6 +81,10 @@ falls to 0.734. Our progress shows up as:
 
 The case for these metrics is in §2.4.
 
+![Metric progression along the model lineage](fiberseq-model-report/metric_progression.png)
+
+*Along the main lineage, accessible-read AUROC, within-bound ρ, matched AUPRC and prior log-odds rise to or past phase-type (dashed), and off-motif TF falls to about an eighth of phase-type's; raw AUROC peaks with spacers + TF/3 and stays below phase-type. Made with `fiberseq-model-report/plot_metric_progression.py`.*
+
 ---
 
 ## 2. Data, splits, and evaluation
@@ -97,9 +101,13 @@ The case for these metrics is in §2.4.
     has 64× the odds of the 5th.
   - ±3 bp captures 95% of the best held-out gain.
   - One strand-symmetric table suffices (A-site vs T-site correlation 0.9998).
-  - Source: 2026-10-30 context-bias note.
-- **Blind positions.** In `AAA[A]AAA` m6A is 0.3% even in the most open reads (2026-11-10). Long A/T
+  - Source: [10-30 context bias](../2026-10-30/fiberseq-m6a-sequence-context-bias.md).
+- **Blind positions.** In `AAA[A]AAA` m6A is 0.3% even in the most open reads ([11-10 footprint screen](../2026-11-10/gm12878-fiberseq-tf-footprint-screen.md)). Long A/T
   runs therefore look protected whatever their occupancy.
+
+![m6A context bias gain by context width](fiberseq-model-report/context_bias.png)
+
+*Held-out gain from context levels off by ±3-4 bp, and the 3′ side carries more than the 5′ side; this motivated the learned ±3 bp context offsets. From the [10-30 context bias](../2026-10-30/fiberseq-m6a-sequence-context-bias.md) note.*
 
 ### 2.2 Splits
 - **Train:** chr2, chr4, chr5, chr7, chr9-19, chr21, chr22, chrX.
@@ -111,16 +119,20 @@ The case for these metrics is in §2.4.
   (2026-11-12).
 
 ### 2.3 TF benchmark
-- **TF selection.** A genome-wide masked footprint screen of 91 motifs (2026-11-10)
+- **TF selection.** A genome-wide masked footprint screen of 91 motifs ([11-10 footprint screen](../2026-11-10/gm12878-fiberseq-tf-footprint-screen.md))
   split the 9 benchmark TFs into two groups:
   - **Footprinting TFs:** CTCF and NRF1 strongly; USF2 (E-box) and CREM (CRE) weakly; RFX5 weakly and
     exploratory, with only 23 bound val sites.
   - **ChIP'd but no detectable footprint:** EBF1, PAX5, SPI1, YY1.
-- **Site labels (2026-11-12).** From ENCODE conservative IDR peaks:
+- **Site labels** ([11-12 IDR benchmark](../2026-11-12/fiber-idr-chip-benchmark.md)). From ENCODE conservative IDR peaks:
   - **bound:** a summit within 100 bp of the motif;
   - **unbound:** no summit within 1 kb;
   - everything in between is excluded.
 - **Windows.** 512 bp windows with at least 90% valid positions and at least 10 reads.
+
+![Footprints graded by ChIP strength](fiberseq-model-report/strong_graded_footprints.png)
+
+*CTCF and NRF1 footprint strongly and the E-box and CRE clearly, with protection over the motif growing with ChIP peak strength while unbound sites stay flat; this split the benchmark into footprinting and non-footprinting TFs. From the 11-10 footprint screen.*
 
 ### 2.4 Metrics, and why each was added
 
@@ -142,6 +154,10 @@ The case for these metrics is in §2.4.
 
 *[LaTeX: state that AUROC differences of ≥ 0.005 are likely real; the GELU seed SD is about 0.001
 AUROC and 0.02 log-odds (2026-11-15/16).]*
+
+![Debiased kernel reference at a CTCF site](fiberseq-model-report/kernel_ctcf_overview.png)
+
+*The model-free debiased kernel P(bound) (red) agrees with the bias-corrected models at a CTCF footprint, its depleted flanks and the neighbouring nucleosomes, while plain phase-type (black) runs high in open DNA. From the [11-13 specificity metrics](../2026-11-13/fiber-specificity-metrics-debiased-kernel.md) note.*
 
 ---
 
@@ -184,7 +200,7 @@ AUROC and 0.02 log-odds (2026-11-15/16).]*
 - **Objective:** KL weight 3. Targets: open 0.31, each TF group 0.015, other_long 0.08, histone 0.55.
 - **Optimizer:** Adam lr 1e-3, no clipping, no EMA.
 
-### 3.3 What was wrong with it (2026-10-30)
+### 3.3 What was wrong with it ([10-30 bias diagnostic](../2026-10-30/fiber-hmm-enzyme-bias-diagnostic.md))
 - **The DNA-only prior learned the m6A context bias.** Prior open rises from 0.000 to 0.262 across
   labelling-efficiency deciles.
 - **States were repurposed to model labelling.** TF_short_weak sat exactly on its band floor (0.550),
@@ -200,49 +216,99 @@ AUROC and 0.02 log-odds (2026-11-15/16).]*
 
 | # | date | change | main evidence | source note |
 |---|---|---|---|---|
-| 1 | 11-09 | learned ±3 bp context offsets (`context_offset_k=3`) | the first model absorbed the context bias into states and prior (§3.3); offsets cost 16,384 parameters; SMF validation NLL 12.337 vs 12.356 | 10-30 bias diagnostic; 11-04 |
-| 2 | 11-09 | one TF group instead of four (`fixed_blocks_single_tf`); TF protection floor 0.85 | the weak TF groups were labelling sinks; the SMF multi-TF ChIP gain came from the KL target, not the weak groups | 10-30; 11-04 |
-| 3 | 11-10 | fixed 147 bp histone, 25 bp invaded-edge taper; other_long 40-100 bp | SMF: with the taper, the histone edge learned freely inside its band (0.27; was at its floor); the variable histone had pinned near its 130 bp minimum (PPC) | 11-03; 10-22 |
-| 4 | 11-10 | bands: open [0.05, 0.45], closed [0.45, 0.995]; TF floor as `min_protected_probability` 0.85 | emissions sat on band edges (PPC); keep TF distinct from open | 10-22; a51fbef |
-| 5 | 11-10 | AlphaGenome frozen-encoder prior (3 blocks, adapters 64, bf16), clip 1.0, EMA 0.999 | SMF: better likelihood and sequence prior; clipping prevents potentials of about 3×10⁵ | 11-06 |
-| 6 | 11-11 | other_long occupancy 0.10 → 0.01, histone 0.60 → 0.69 (`ol001`) | other_long absorbed 16% of positions and many CTCF footprints (footprint-read P(TF) 0.49 vs 0.72 for phase-type); after: P(TF) 0.54, IDR metrics +0.00 to 0.03 | 11-11 other_long |
-| 7 | 11-12 | IDR benchmark; train-chromosome replication | see §2.3-2.4 | 11-12 IDR; train vs val |
-| 8 | 11-12 | 10 bp open spacers around TF (`spacer_length=10`) and TF target 0.02 → 0.0067 | largest single gain in the lineage: AUROC 0.716 → 0.772, ρ within bound 0.106 → 0.169, mean prior log-odds 0.44 → 0.80; confirmed on train; prior log-odds CTCF 0.87 → 1.94 from spacers; TF bases in chains > 40 bp 8% vs 26% for phase-type | 11-12 spacer |
-| 9 | 11-13/14 | no TF chaining (`spacer_repeat_probability=0`) | without other_long, TF chains replaced it; forbidding chaining recovered most of the loss (`ag_nool` AUROC 0.633 → `ag_nochain` 0.715; off-motif 28.8 → 13.3) | 11-13 no-other_long; 11-14 |
-| 10 | 11-14 | prior TF log-odds as a standing metric; no post hoc prior scaling | the posterior benchmark hid a collapsed prior | 11-14 |
-| 11 | 11-15 | residual GELU prior head, h + conv(gelu(RMSNorm(h))), zero-init | the ReLU head died: 77-100% dead first-layer units; one seed collapsed to a constant prior (log-odds 0.00); GELU: 3 seeds, log-odds 0.74 / 0.71 / 0.71, SD 0.02 | 11-15 |
-| 12 | 11-16 | prior occupancy KL weight 10 → 300 | KL 10 left the prior's TF occupancy free; at KL 300 AUPRC 0.488 → 0.525, off-motif 14.4 → 6.2, log-odds 0.74 → 0.83, AUROC 0.741 → 0.744 | 11-16 nub mechanism and spacer/duration notes |
-| 13 | 11-17 | tied TF and other_long potentials (`tied_blocks`) | the prior's per-microstate potentials made 8 bp TF the preferred length (−1.3 nat penalty at state 9); tying cut TF calls at the minimum from 40% to 19%; log-odds 0.83 → 0.94 | 11-16 spacer/duration; ablation round 1 |
-| 14 | 11-17 | TF minimum 8 → 15 bp | 8 bp TF "nubs" patched clustered protection in open DNA; short calls at weak-footprint TFs look like background; AUROC 0.744 → 0.756, ρ 0.227, kernel support 82% → 92% | 11-16 overdispersion; sparsity vs dissociation; round 1 |
-| 15 | 11-17 | histone taper 25 → 40 bp with edge floor 0.2 | nucleosome edges are about 35 bp wide (11-13); round 1: AUROC +0.007, off-motif 6.18 → 5.84, other_long at the 100 bp cap 58% → 49% | 11-13 nucleosome edges; round 1 |
-| 16 | 11-17 | combined 13 + 14 + 15 (`r2_full`) | AUROC 0.764, AUPRC 0.528, off-motif 5.65, log-odds 1.01; each part contributes (leave-one-out) | ablation round 2 |
-| 17 | 11-17 | variable-length nucleosome, 100-190 bp: P(d) ∝ exp(−\|d − 147\|/15), 40-state exit tail, tied histone potentials | other_long held short nucleosomes (100 bp cap; spans 104-113 bp) and over-long ones (other_long at its minimum beside a histone; spans about 160-190 bp); result: AUROC 0.765, AUPRC 0.535, off-motif 4.78, log-odds 1.09, other_long 323 → 130 per 1,000 reads | short other_long; variable nucleosome |
-| 18 | 11-17 | TF maximum 40 → 60 bp (`hist190_tf60`) | aimed at the isolated 41-60 bp other_long patches (27% on bound CTCF); result: AUROC 0.768, ρ within bound 0.232, AUPRC 0.538, off-motif 4.69, log-odds 1.08; but only 0.7% of TF calls exceed 40 bp (TF's zero-bias duration prior makes 41-59 bp 4-5× less likely than other_long's), so the gains likely come from removing the 40 bp cap's censoring | TF 15-60 note |
+| 1 | 11-09 | learned ±3 bp context offsets (`context_offset_k=3`) | the first model absorbed the context bias into states and prior (§3.3); offsets cost 16,384 parameters; SMF validation NLL 12.337 vs 12.356 | [10-30 bias diagnostic](../2026-10-30/fiber-hmm-enzyme-bias-diagnostic.md); [11-04 controlled metrics, context offsets (SMF)](../2026-11-04/controlled-chip-metrics-and-context-offsets.md) |
+| 2 | 11-09 | one TF group instead of four (`fixed_blocks_single_tf`); TF protection floor 0.85 | the weak TF groups were labelling sinks; the SMF multi-TF ChIP gain came from the KL target, not the weak groups | [10-30 bias diagnostic](../2026-10-30/fiber-hmm-enzyme-bias-diagnostic.md); [11-04 controlled metrics, context offsets (SMF)](../2026-11-04/controlled-chip-metrics-and-context-offsets.md) |
+| 3 | 11-10 | fixed 147 bp histone, 25 bp invaded-edge taper; other_long 40-100 bp | SMF: with the taper, the histone edge learned freely inside its band (0.27; was at its floor); the variable histone had pinned near its 130 bp minimum (PPC) | [11-03 147 bp histone (SMF)](../2026-11-03/merged-cgc-147bp-histone-run.md); [10-22 PPC](../2026-10-22/posterior-predictive-checks.md) |
+| 4 | 11-10 | bands: open [0.05, 0.45], closed [0.45, 0.995]; TF floor as `min_protected_probability` 0.85 | emissions sat on band edges (PPC); keep TF distinct from open | [10-22 PPC](../2026-10-22/posterior-predictive-checks.md); commit a51fbef |
+| 5 | 11-10 | AlphaGenome frozen-encoder prior (3 blocks, adapters 64, bf16), clip 1.0, EMA 0.999 | SMF: better likelihood and sequence prior; clipping prevents potentials of about 3×10⁵ | [11-06 AlphaGenome prior (SMF)](../2026-11-06/alphagenome-encoder-prior.md) |
+| 6 | 11-11 | other_long occupancy 0.10 → 0.01, histone 0.60 → 0.69 (`ol001`) | other_long absorbed 16% of positions and many CTCF footprints (footprint-read P(TF) 0.49 vs 0.72 for phase-type); after: P(TF) 0.54, IDR metrics +0.00 to 0.03 | [11-11 other_long](../2026-11-11/fiber-other-long-footprint-reads-and-linkers.md) |
+| 7 | 11-12 | IDR benchmark; train-chromosome replication | see §2.3-2.4 | [11-12 IDR benchmark](../2026-11-12/fiber-idr-chip-benchmark.md); [11-12 train vs val](../2026-11-12/fiber-train-vs-val-chip-benchmark.md) |
+| 8 | 11-12 | 10 bp open spacers around TF (`spacer_length=10`) and TF target 0.02 → 0.0067 | largest single gain in the lineage: AUROC 0.716 → 0.772, ρ within bound 0.106 → 0.169, mean prior log-odds 0.44 → 0.80; confirmed on train; prior log-odds CTCF 0.87 → 1.94 from spacers; TF bases in chains > 40 bp 8% vs 26% for phase-type | [11-12 spacers + TF/3](../2026-11-12/fiber-tf-spacer-and-tf-target.md) |
+| 9 | 11-13/14 | no TF chaining (`spacer_repeat_probability=0`) | without other_long, TF chains replaced it; forbidding chaining recovered most of the loss (`ag_nool` AUROC 0.633 → `ag_nochain` 0.715; off-motif 28.8 → 13.3) | [11-13 no other_long, chaining, KL](../2026-11-13/fiber-no-other-long-tf-chaining.md); [11-14 prior log-odds](../2026-11-14/fiber-prior-tf-log-odds-and-design-takeaways.md) |
+| 10 | 11-14 | prior TF log-odds as a standing metric; no post hoc prior scaling | the posterior benchmark hid a collapsed prior | [11-14 prior log-odds](../2026-11-14/fiber-prior-tf-log-odds-and-design-takeaways.md) |
+| 11 | 11-15 | residual GELU prior head, h + conv(gelu(RMSNorm(h))), zero-init | the ReLU head died: 77-100% dead first-layer units; one seed collapsed to a constant prior (log-odds 0.00); GELU: 3 seeds, log-odds 0.74 / 0.71 / 0.71, SD 0.02 | [11-15 ReLU collapse, GELU head](../2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md) |
+| 12 | 11-16 | prior occupancy KL weight 10 → 300 | KL 10 left the prior's TF occupancy free; at KL 300 AUPRC 0.488 → 0.525, off-motif 14.4 → 6.2, log-odds 0.74 → 0.83, AUROC 0.741 → 0.744 | [11-16 nub mechanism](../2026-11-16/fiber-tf-nub-mechanism-overview.md); [11-16 spacer and duration shaping](../2026-11-16/fiber-tf-nubs-spacer-and-duration-shaping.md) |
+| 13 | 11-17 | tied TF and other_long potentials (`tied_blocks`) | the prior's per-microstate potentials made 8 bp TF the preferred length (−1.3 nat penalty at state 9); tying cut TF calls at the minimum from 40% to 19%; log-odds 0.83 → 0.94 | [11-16 spacer and duration shaping](../2026-11-16/fiber-tf-nubs-spacer-and-duration-shaping.md); [round 1](../2026-11-16/fiber-ablation-round1-tie-tf-length-histone-other-long-open.md) |
+| 14 | 11-17 | TF minimum 8 → 15 bp | 8 bp TF "nubs" patched clustered protection in open DNA; short calls at weak-footprint TFs look like background; AUROC 0.744 → 0.756, ρ 0.227, kernel support 82% → 92% | [11-16 open overdispersion](../2026-11-16/fiber-open-state-overdispersion.md); [11-16 sparsity vs dissociation](../2026-11-16/fiber-short-tf-calls-sparsity-vs-dissociation.md); [round 1](../2026-11-16/fiber-ablation-round1-tie-tf-length-histone-other-long-open.md) |
+| 15 | 11-17 | histone taper 25 → 40 bp with edge floor 0.2 | nucleosome edges are about 35 bp wide (11-13); round 1: AUROC +0.007, off-motif 6.18 → 5.84, other_long at the 100 bp cap 58% → 49% | [11-13 nucleosome edges](../2026-11-13/fiber-nucleosome-lengths-and-edges.md); [round 1](../2026-11-16/fiber-ablation-round1-tie-tf-length-histone-other-long-open.md) |
+| 16 | 11-17 | combined 13 + 14 + 15 (`r2_full`) | AUROC 0.764, AUPRC 0.528, off-motif 5.65, log-odds 1.01; each part contributes (leave-one-out) | [round 2](fiber-ablation-round2-full-model-leave-one-out.md) |
+| 17 | 11-17 | variable-length nucleosome, 100-190 bp: P(d) ∝ exp(−\|d − 147\|/15), 40-state exit tail, tied histone potentials | other_long held short nucleosomes (100 bp cap; spans 104-113 bp) and over-long ones (other_long at its minimum beside a histone; spans about 160-190 bp); result: AUROC 0.765, AUPRC 0.535, off-motif 4.78, log-odds 1.09, other_long 323 → 130 per 1,000 reads | [short other_long](fiber-short-other-long-calls.md); [variable nucleosome](fiber-variable-length-nucleosome.md) |
+| 18 | 11-17 | TF maximum 40 → 60 bp (`hist190_tf60`) | aimed at the isolated 41-60 bp other_long patches (27% on bound CTCF); result: AUROC 0.768, ρ within bound 0.232, AUPRC 0.538, off-motif 4.69, log-odds 1.08; but only 0.7% of TF calls exceed 40 bp (TF's zero-bias duration prior makes 41-59 bp 4-5× less likely than other_long's), so the gains likely come from removing the 40 bp cap's censoring | [TF 15-60](fiber-tf-15-60.md) |
 
-*[LaTeX: one short subsection per row, with a figure where one exists (§8).]*
+*[LaTeX: one short subsection per row, with its figure from §4.3.]*
 
 ### 4.2 Tried and not adopted
 
 | change | result | source |
 |---|---|---|
-| cross-read kernel denoising before the HMM | own-read smoothing beats cross-read borrowing (AUROC 0.890 vs 0.878); the kernel biases the m6A rate | 10-30 kernel |
-| sequence-dependent TF emission head | learned a CGC artifact (74% of its variance), not enzyme bias or TF identity | 11-02 (SMF) |
-| phase-type state structure with the AG prior (`ag_pt`: TF 7-40, no other_long) | the prior chained capped TFs through short open gaps: 22% of TF bases in chains > 100 bp; NRF1 AUROC 0.74 vs 0.89 | 11-12 ag_pt |
-| per-read m6A-rate filter 2-8% | drops about 75% of reads; hurts within-bound ranking (USF2 ρ 0.29 → −0.03) | 11-12 rate |
-| molecule-rate filter (background rate < 2%) | drops 3.4% of reads; small effect in the ablation (0.769 vs 0.773); not in the current model | 11-13 cuts; 11-15 |
-| labelling-efficiency emissions (per-read b_m) | better within-bound ρ (0.195 vs 0.169) but worse AUROC (0.730 vs 0.772; −0.03 in the ablation); degraded the prior (RFX5 log-odds 0.43 → 0.11); per-read b_m miscalibrated by ±3-4 points | 11-12 efficiency; 11-14; 11-15; 11-16 undermethylated reads |
-| removing other_long | TF chains replace it (`ag_nool` AUROC 0.633, off-motif 28.8) | 11-13 |
-| KL 3000 | prior collapsed: log-odds about 0 for every TF while the posterior still scored 0.709 | 11-13; 11-14; 11-15 |
-| constant (sequence-free) prior | diagnostic: AUROC 0.790-0.796 but no prior information; explains why an informative prior can lower AUROC | 11-13; 11-15 |
-| other_long narrowed to 45-80 or 50-90 bp | re-piles at its new ends; AUPRC −0.008 / −0.009 | rounds 1-2 |
-| open band raised to 0.65 | open learns 0.488; AUROC, AUPRC and log-odds drop | round 1 |
-| histone 100-147 only | AUROC 0.743 (−0.021), every TF lower; over-long nucleosomes remain | variable nucleosome |
+| cross-read kernel denoising before the HMM | own-read smoothing beats cross-read borrowing (AUROC 0.890 vs 0.878); the kernel biases the m6A rate | [10-30 kernel denoising](../2026-10-30/fiberseq-cross-read-kernel-denoising.md) |
+| sequence-dependent TF emission head | learned a CGC artifact (74% of its variance), not enzyme bias or TF identity | [11-02 emission head (SMF)](../2026-11-02/single-tf-emission-head-learns-cgc-not-tf-identity.md) |
+| phase-type state structure with the AG prior (`ag_pt`: TF 7-40, no other_long) | the prior chained capped TFs through short open gaps: 22% of TF bases in chains > 100 bp; NRF1 AUROC 0.74 vs 0.89 | [11-12 AG + phase-type structure](../2026-11-12/fiber-ag-phase-type-structure-run.md) |
+| per-read m6A-rate filter 2-8% | drops about 75% of reads; hurts within-bound ranking (USF2 ρ 0.29 → −0.03) | [11-12 read m6A rate](../2026-11-12/fiber-read-m6a-rate-evaluation.md) |
+| molecule-rate filter (background rate < 2%) | drops 3.4% of reads; small effect in the ablation (0.769 vs 0.773); not in the current model | [11-13 molecule cuts](../2026-11-13/fiber-molecule-efficiency-cuts.md); [11-15 ReLU collapse, GELU head](../2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md) |
+| labelling-efficiency emissions (per-read b_m) | better within-bound ρ (0.195 vs 0.169) but worse AUROC (0.730 vs 0.772; −0.03 in the ablation); degraded the prior (RFX5 log-odds 0.43 → 0.11); per-read b_m miscalibrated by ±3-4 points | [11-12 labelling efficiency](../2026-11-12/fiber-labelling-efficiency-emissions.md); [11-14 prior log-odds](../2026-11-14/fiber-prior-tf-log-odds-and-design-takeaways.md); [11-15 ReLU collapse, GELU head](../2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md); [11-16 under-methylated reads](../2026-11-16/fiber-tf-nubs-undermethylated-reads.md) |
+| removing other_long | TF chains replace it (`ag_nool` AUROC 0.633, off-motif 28.8) | [11-13 no other_long, chaining, KL](../2026-11-13/fiber-no-other-long-tf-chaining.md) |
+| KL 3000 | prior collapsed: log-odds about 0 for every TF while the posterior still scored 0.709 | [11-13 no other_long, chaining, KL](../2026-11-13/fiber-no-other-long-tf-chaining.md); [11-14 prior log-odds](../2026-11-14/fiber-prior-tf-log-odds-and-design-takeaways.md); [11-15 ReLU collapse, GELU head](../2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md) |
+| constant (sequence-free) prior | diagnostic: AUROC 0.790-0.796 but no prior information; explains why an informative prior can lower AUROC | [11-13 no other_long, chaining, KL](../2026-11-13/fiber-no-other-long-tf-chaining.md); [11-15 ReLU collapse, GELU head](../2026-11-15/fiber-prior-ablation-and-relu-head-collapse.md) |
+| other_long narrowed to 45-80 or 50-90 bp | re-piles at its new ends; AUPRC −0.008 / −0.009 | [round 1](../2026-11-16/fiber-ablation-round1-tie-tf-length-histone-other-long-open.md); [round 2](fiber-ablation-round2-full-model-leave-one-out.md) |
+| open band raised to 0.65 | open learns 0.488; AUROC, AUPRC and log-odds drop | [round 1](../2026-11-16/fiber-ablation-round1-tie-tf-length-histone-other-long-open.md) |
+| histone 100-147 only | AUROC 0.743 (−0.021), every TF lower; over-long nucleosomes remain | [variable nucleosome](fiber-variable-length-nucleosome.md) |
+
+### 4.3 Evidence figures for the main changes
+
+![Protected stretch length by read methylation](fiberseq-model-report/protected_stretch_lengths.png)
+
+*Row 6: nucleosome-length peaks shift from about 150-155 bp on lightly methylated reads to about 115-120 bp on heavily methylated ones, and light reads show merged dinucleosomes near 300 bp; other_long was absorbing much of this spread.*
+
+![TF chain through short open gaps](fiberseq-model-report/tf_chain_example_read.png)
+
+*§4.2 (`ag_pt`): with only a 40 bp TF cap, the MAP path chains capped TF blocks through open gaps of a few bp under a diffuse TF prior; this motivated open spacers around TF (row 8).*
+
+![CTCF footprint under three models](fiberseq-model-report/ctcf_three_models.png)
+
+*Row 8: all three models call TF on a CTCF footprint, but phase-type adds TF calls on nearby protected stretches that the spacer model calls open or histone.*
+
+![Prior TF log-odds across the AG lineage](fiberseq-model-report/prior_log_odds_lineage.png)
+
+*Row 10: prior log-odds per TF shows the spacers sharpening the prior and labelling efficiency, dropping other_long and KL 3000 eroding it, which the posterior benchmark had hidden.*
+
+![Prior log-odds with a collapsed ReLU head](fiberseq-model-report/prior_log_odds_ablation.png)
+
+*Row 11: one ReLU-head replicate of base B has all-zero prior log-odds because its head died, which motivated the residual GELU head.*
+
+![Viterbi lengths by KL weight](fiberseq-model-report/viterbi_lengths_kl_proportion.png)
+
+*Row 12: Viterbi segment lengths at occupancy-KL weights 10, 300 and 1000 (GELU head, prior ×1). The 8 bp TF spike persists at KL 300; tying and the 15 bp minimum (rows 13-14) removed it.*
+
+![Nucleosome edge accessibility](fiberseq-model-report/nucleosome_edges.png)
+
+*Row 15: accessibility rises roughly exponentially from about 40 to 75 bp from the dyad, so nucleosome edges are wide; this motivated the 40 bp taper with a 0.2 floor.*
+
+![Viterbi lengths, ablation round 2](fiberseq-model-report/viterbi_lengths_r2_proportion.png)
+
+*Rows 13-16: without tying, TF lengths spike at the 15 bp minimum; with 8-40 bp, 8 bp nubs remain; other_long piles at whatever its maximum is.*
+
+![Short other_long beside a nucleosome](fiberseq-model-report/nucleosome_adjacent_chr20_w0001741_r053.png)
+
+*Row 17 motivation: a minimum-length other_long beside a 147 bp histone fills a 172 bp protected stretch, i.e. an over-long nucleosome footprint.*
+
+![Isolated short other_long at CTCF](fiberseq-model-report/isolated_ctcf_chr8_w0001541_r017.png)
+
+*Row 18 motivation: an isolated 40 bp other_long over a CTCF motif, with the posterior split between other_long and TF at TF's old 40 bp limit.*
+
+![Viterbi lengths with a variable nucleosome](fiberseq-model-report/viterbi_lengths_r3_proportion.png)
+
+*Row 17: the variable nucleosome removes other_long's 100 bp pile-up and spreads histone lengths over the allowed range.*
 
 ---
 
 ## 5. Current model specification
 
-*[LaTeX: one table per group, with a diagram of the transition topology.]*
+*[LaTeX: one table per group.]*
+
+![Transition topology](fiberseq-model-report/transition_topology.png)
+
+*The open state feeds three blocks: TF through 10-state open spacers, other_long, and the histone, whose variable core always ends in a 40-state exit tail so both edges are tapered; the prior adds one tied potential per block. Ranges are from the TF 15-60 run (TF is 15-40 in `hist100_190`). Made with `fiberseq-model-report/plot_transition_topology.py`.*
 
 **Data.** `fiberseq_m6a`; splits as §2.2; at least 20 calls per read; no molecule filter; no labelling
 efficiency.
@@ -315,31 +381,31 @@ checkpointing), 100 epochs, seed 0.
 
 ### 6.2 Per-TF AUROC, prior ×1
 
-| TF | phase-type | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` |
-|---|---|---|---|---|---|---|---|---|
-| CTCF | 0.884 | 0.840 | 0.850 | 0.876 | 0.862 | 0.866 | 0.868 | 0.861 |
-| NRF1 | 0.894 | 0.786 | 0.818 | 0.886 | 0.832 | 0.840 | 0.868 | 0.859 |
-| USF2 | 0.847 | 0.718 | 0.748 | 0.796 | 0.774 | 0.793 | 0.788 | 0.783 |
-| CREM | 0.844 | 0.736 | 0.744 | 0.803 | 0.770 | 0.740 | 0.825 | 0.808 |
-| RFX5 | 0.792 | 0.710 | 0.706 | 0.763 | 0.748 | 0.738 | 0.753 | 0.771 |
-| EBF1 | 0.719 | 0.678 | 0.682 | 0.725 | 0.706 | 0.734 | 0.731 | 0.729 |
-| PAX5 | 0.756 | 0.626 | 0.659 | 0.708 | 0.655 | 0.674 | 0.697 | 0.702 |
-| SPI1 | 0.820 | 0.673 | 0.689 | 0.745 | 0.721 | 0.722 | 0.746 | 0.753 |
-| YY1 | 0.726 | 0.537 | 0.552 | 0.645 | 0.599 | 0.590 | 0.599 | 0.617 |
+| TF | phase-type | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` | `hist190_tf60` |
+|---|---|---|---|---|---|---|---|---|---|
+| CTCF | 0.884 | 0.840 | 0.850 | 0.876 | 0.862 | 0.866 | 0.868 | 0.861 | 0.865 |
+| NRF1 | 0.894 | 0.786 | 0.818 | 0.886 | 0.832 | 0.840 | 0.868 | 0.859 | 0.866 |
+| USF2 | 0.847 | 0.718 | 0.748 | 0.796 | 0.774 | 0.793 | 0.788 | 0.783 | 0.782 |
+| CREM | 0.844 | 0.736 | 0.744 | 0.803 | 0.770 | 0.740 | 0.825 | 0.808 | 0.803 |
+| RFX5 | 0.792 | 0.710 | 0.706 | 0.763 | 0.748 | 0.738 | 0.753 | 0.771 | 0.771 |
+| EBF1 | 0.719 | 0.678 | 0.682 | 0.725 | 0.706 | 0.734 | 0.731 | 0.729 | 0.727 |
+| PAX5 | 0.756 | 0.626 | 0.659 | 0.708 | 0.655 | 0.674 | 0.697 | 0.702 | 0.706 |
+| SPI1 | 0.820 | 0.673 | 0.689 | 0.745 | 0.721 | 0.722 | 0.746 | 0.753 | 0.755 |
+| YY1 | 0.726 | 0.537 | 0.552 | 0.645 | 0.599 | 0.590 | 0.599 | 0.617 | 0.633 |
 
 ### 6.3 Per-TF prior TF log-odds
 
-| TF | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` |
-|---|---|---|---|---|---|---|---|
-| CTCF | 0.87 | 0.90 | 2.02 | 1.84 | 1.97 | 2.56 | 2.70 |
-| NRF1 | 0.85 | 1.11 | 1.55 | 1.40 | 1.71 | 1.68 | 1.81 |
-| USF2 | 0.30 | 0.42 | 0.79 | 0.65 | 0.99 | 1.08 | 1.26 |
-| CREM | 0.29 | 0.35 | 0.60 | 0.77 | 0.78 | 0.87 | 0.89 |
-| RFX5 | 0.32 | 0.22 | 0.43 | 0.57 | 0.43 | 0.75 | 0.85 |
-| EBF1 | 0.20 | 0.20 | 0.40 | 0.33 | 0.48 | 0.54 | 0.56 |
-| PAX5 | 0.20 | 0.21 | 0.42 | 0.38 | 0.35 | 0.57 | 0.51 |
-| SPI1 | 0.25 | 0.32 | 0.48 | 0.48 | 0.49 | 0.66 | 0.73 |
-| YY1 | 0.14 | 0.20 | 0.49 | 0.27 | 0.28 | 0.37 | 0.51 |
+| TF | AG KL 10 | AG ol001 | `ag_sptf` | GELU B | GELU B KL 300 | `r2_full` | `hist100_190` | `hist190_tf60` |
+|---|---|---|---|---|---|---|---|---|
+| CTCF | 0.87 | 0.90 | 2.02 | 1.84 | 1.97 | 2.56 | 2.70 | 2.77 |
+| NRF1 | 0.85 | 1.11 | 1.55 | 1.40 | 1.71 | 1.68 | 1.81 | 2.05 |
+| USF2 | 0.30 | 0.42 | 0.79 | 0.65 | 0.99 | 1.08 | 1.26 | 1.04 |
+| CREM | 0.29 | 0.35 | 0.60 | 0.77 | 0.78 | 0.87 | 0.89 | 0.63 |
+| RFX5 | 0.32 | 0.22 | 0.43 | 0.57 | 0.43 | 0.75 | 0.85 | 0.86 |
+| EBF1 | 0.20 | 0.20 | 0.40 | 0.33 | 0.48 | 0.54 | 0.56 | 0.58 |
+| PAX5 | 0.20 | 0.21 | 0.42 | 0.38 | 0.35 | 0.57 | 0.51 | 0.51 |
+| SPI1 | 0.25 | 0.32 | 0.48 | 0.48 | 0.49 | 0.66 | 0.73 | 0.67 |
+| YY1 | 0.14 | 0.20 | 0.49 | 0.27 | 0.28 | 0.37 | 0.51 | 0.59 |
 
 ### 6.4 State-level diagnostics (Viterbi, every 8th val window)
 
@@ -348,6 +414,7 @@ checkpointing), 100 epochs, seed 0.
 | GELU B, KL 300 | 269 | 82% | 40% (8 bp) | 395 | 58% | 147 (fixed) |
 | `r2_full` | 123 | 92% | 20% (15 bp) | 323 | 40% | 147 (fixed) |
 | `hist100_190` | 116 | 86% | 21% (15 bp) | 130 | 9% | median 142 (100-190) |
+| `hist190_tf60` | 107 | 86% | 17% (15 bp) | 126 | 9% | median 142 (100-190) |
 
 ### 6.5 Reading the progression
 *[Prose for LaTeX.]*
@@ -380,27 +447,19 @@ checkpointing), 100 epochs, seed 0.
 
 ---
 
-## 8. Figure plan for the LaTeX version
-*[Copy each figure into `report/figures/`; all source files are on scratch.]*
+## 8. Figures
+All figures are in `fiberseq-model-report/`, each under 200 KB. Most are copied from the notes linked in
+their captions; `metric_progression.png` and `transition_topology.png` were made for this report by
+the two scripts in the same folder.
 
-1. Transition topology diagram: open hub, spacers, TF, other_long, histone with exit tail. *[to draw]*
-2. m6A context bias: rate by context, held-out gain by context width (10-30 note figures).
-3. Footprint screen and blind positions (11-10 note figures).
-4. ReLU head collapse vs GELU: dead units, prior log-odds by seed (11-15 note figures;
-   `fiber_eval_work/prior_log_odds/prior_log_odds_*.png`).
-5. Viterbi length histograms through rounds 1-3 (`tf_mechanism/figures/viterbi_lengths_{kl,r2,r3}_proportion.png`).
-6. Short other_long examples, isolated vs nucleosome-adjacent (2026-11-17 note figures).
-7. Per-read posteriors at bound motifs for the lineage (`gm12878_validation/r2_ablation_panels/`;
-   `evaluation.tf_chip.plot_model_comparison`).
-8. Metric progression chart: AUROC, AUPRC, off-motif TF and prior log-odds by model
-   (`fiber_eval_work/report_metrics/lineage_metrics.tsv`). *[to make]*
+*[To do: per-read posteriors at bound motifs for the lineage (`gm12878_validation/r2_ablation_panels/`,
+`evaluation.tf_chip.plot_model_comparison`), and a footprint-screen blind-position figure.]*
 
 ---
 
 ## Sources
 
-- **Research notes:** `LM_research_notes/projects/smf-hmm/`, 2026-10-22 to 2026-11-17. The index is
-  `README.md`.
+- **Research notes:** the smf-hmm notes from 2026-10-22 to 2026-11-17; see the [project index](../README.md).
 - **Metric tables** in `/scratch/users/diamant/fiber_eval_work/`:
   - `idr_summary_*_val.tsv`;
   - `kernel_ref/specificity*/{auprc_matched,off_motif}.tsv`;
