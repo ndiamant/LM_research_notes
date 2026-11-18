@@ -1,5 +1,9 @@
 # SMF HMM
 
+## Reports
+
+- [Building the GM12878 Fiber-seq HMM: components, evidence, and metrics](2026-11-17/fiberseq-model-report.md) (living draft, source for the PDF report)
+
 ## Notes
 
 - 2026-11-17: [TF 15-60: small gains (ρ within bound 0.232) from removing the 40 bp cap; TF barely uses 41-60 bp because its duration prior favours other_long there](2026-11-17/fiber-tf-15-60.md)
