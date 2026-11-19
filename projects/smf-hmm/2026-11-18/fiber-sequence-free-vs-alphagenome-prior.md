@@ -53,6 +53,13 @@ the same occupancy targets. Val chromosomes only, prior ×1.
   call covers the benchmark motif; the kernel shows protection spanning both.
 - **Where the read has a footprint, the prior helps.** 96.5% of the bound sites it raises most have
   kernel-confirmed footprints.
+- **The prior's TF bump has the footprint's width and shape, not the motif's.** At bound sites it matches
+  the sequence-free model's posterior, which only sees reads:
+  - half-max width (CTCF 31 vs 34 bp; NRF1 23 vs 24 bp), much wider than the motifs;
+  - asymmetry (CTCF extends 5′ of the motif, YY1 3′).
+
+  So the spread beyond the motif reflects footprints being wider than motifs. Repeated 1D sliding or
+  search along the molecule is unlikely to explain it (reasoning in Details).
 
 **Interpretation** (inferred from these examples and site-level statistics).
 - **Specificity of the prior.** The AlphaGenome prior is a better TF *locator* where TFs footprint.
@@ -91,6 +98,52 @@ the same occupancy targets. Val chromosomes only, prior ×1.
   | EBF1 | 0.737 | 0.753 | 0.704 |
   | PAX5 | 0.731 | 0.746 | 0.758 |
   | YY1 | 0.637 | 0.707 | 0.704 |
+
+- **Per-TF metrics (option B), AlphaGenome / sequence-free.** Better value in bold.
+
+  | TF | bound / unbound | AUROC | stratified AUROC | protected-read AUROC | ρ within bound | matched AUPRC |
+  |---|---|---|---|---|---|---|
+  | CTCF | 697 / 1044 | 0.880 / **0.884** | **0.827** / 0.817 | 0.887 / **0.890** | **0.284** / 0.269 | **0.849** / 0.827 |
+  | NRF1 | 215 / 1285 | 0.877 / **0.890** | **0.785** / 0.764 | 0.912 / **0.918** | 0.515 / **0.524** | **0.785** / 0.761 |
+  | USF2 | 76 / 528 | 0.785 / **0.799** | 0.669 / **0.671** | 0.800 / **0.814** | **0.352** / 0.347 | 0.622 / 0.624 |
+  | CREM | 80 / 218 | 0.793 / **0.814** | 0.683 / **0.692** | 0.815 / **0.830** | 0.411 / **0.437** | **0.566** / 0.545 |
+  | RFX5 | 23 / 1080 | 0.766 / **0.804** | 0.709 / **0.722** | 0.773 / **0.806** | **−0.067** / −0.128 | **0.463** / 0.450 |
+  | SPI1 | 439 / 1065 | 0.763 / **0.778** | **0.692** / 0.676 | 0.767 / **0.780** | **0.234** / 0.208 | **0.403** / 0.364 |
+  | EBF1 | 438 / 1443 | 0.737 / **0.753** | 0.689 / **0.694** | 0.742 / **0.756** | **0.382** / 0.362 | **0.392** / 0.384 |
+  | PAX5 | 195 / 877 | 0.731 / **0.746** | **0.645** / 0.608 | 0.747 / **0.756** | **0.074** / 0.037 | **0.315** / 0.288 |
+  | YY1 | 127 / 272 | 0.637 / **0.707** | 0.510 / **0.532** | 0.655 / **0.722** | **0.032** / 0.013 | 0.287 / 0.286 |
+
+  - Sequence-free wins raw and protected-read AUROC for every TF. The gap is tiny for CTCF and largest
+    for YY1 and RFX5.
+  - The prior wins matched AUPRC for 6 of 9 TFs, and ρ within bound for 7 of 9.
+  - The prior wins stratified AUROC for the TFs with strong, motif-specific footprints (CTCF, NRF1,
+    SPI1, PAX5) and loses slightly for the weak ones. RFX5 has only 23 bound sites.
+
+- **Footprint shape at bound sites.** Motif-centred P(TF), strand-aligned, averaged over IDR-bound sites
+  (val, option B). Width is the full width at half maximum above the flank level; centre of mass and
+  the right / left mass ratio are taken within ±60 bp; "+" is 3′ of the motif.
+
+  | TF | track | half-max width | centre of mass | right / left mass |
+  |---|---|---|---|---|
+  | CTCF | AlphaGenome prior | 31 bp | −2.5 bp | 0.73 |
+  | CTCF | AlphaGenome posterior | 34 bp | −2.6 bp | 0.75 |
+  | CTCF | sequence-free posterior | 34 bp | −2.5 bp | 0.77 |
+  | NRF1 | AlphaGenome prior | 23 bp | +0.6 bp | 1.10 |
+  | NRF1 | AlphaGenome posterior | 24 bp | −0.3 bp | 1.12 |
+  | NRF1 | sequence-free posterior | 29 bp | −1.2 bp | 1.05 |
+  | YY1 | AlphaGenome prior | 31 bp | +8.1 bp | 1.21 |
+  | YY1 | AlphaGenome posterior | 33 bp | +10.3 bp | 1.37 |
+  | YY1 | sequence-free posterior | 41 bp | +10.4 bp | 1.51 |
+
+  At unbound motifs the prior's bump is low and broad: at NRF1, peak 0.010 over a flank of 0.008, about
+  110 bp half-max width. That looks like regional sequence context (promoters, CpG islands), not a
+  footprint.
+
+![Scaled motif-centred P(TF) profiles](fiber-sequence-free-vs-alphagenome-prior/bound_motif_profiles.png)
+
+*At bound CTCF and NRF1 motifs, the prior's TF bump (dashed) has the same width and asymmetry as the
+posterior of a model that never sees sequence (green). The prior has learned the footprint's extent
+around the motif. SPI1 and YY1 show the same core with noisier flanks; YY1's protection extends 3′.*
 
 - **Site-level disagreement vs read evidence (option B).** Sites are binned by quintile of (AlphaGenome
   − sequence-free) motif P(TF); the kernel confident-footprint share is from
@@ -141,6 +194,27 @@ prior is 0.65, leaving the benchmark motif near 0; the sequence-free model's TF 
     protection, not on ChIP for the other factor.
 - **Not checked:** whether the gap closes on ChIP-based labels that ignore motif identity (any IDR
   peak of any TF).
+- **Why the bump is wider than the motif** (inferred, not tested). Several mechanisms can make the
+  protected stretch wider than the motif's base contacts:
+  - the protein's own footprint is larger than its contacts;
+  - the methyltransferase is sterically excluded next to a bound protein;
+  - partners add protection on one side, e.g. cohesin at CTCF.
+
+  The TF state also lasts 15-60 bp, so short motifs such as NRF1's (11 bp) get at least 15 bp. In a
+  single read, the prior can look wider than that read's footprint because it averages over footprint
+  positions and lengths across reads and sites.
+- **Why sliding is unlikely to explain the bump.**
+  - Facilitated diffusion moves a TF over tens to hundreds of bp within milliseconds per encounter.
+  - Fiber-seq labelling runs for minutes, and an A stays unmethylated only if it is covered for much of
+    that time.
+  - A sliding TF would therefore barely change any single base's methylation and leave no footprint.
+  - The prior also never sees reads; it learns a population average from sequence.
+
+  Flexible binding registers, or dissociation and rebinding during labelling, would fit the data better.
+  How much CTCF's position varies between reads is tested in
+  [CTCF footprint position across reads](../2026-11-19/fiber-ctcf-footprint-position-variability.md): positions vary about 2× the read-noise null, mostly from merging with adjacent protection; isolated footprints still vary 1.8×, mainly at the 3′ edge.
+- **Profiles:** `fiber_eval_work/seqfree/motif_profiles.py`, which writes `seqfree/profiles.tsv.gz`, and
+  `seqfree/plot_profiles.py`.
 
 ```bash
 S=/scratch/users/diamant; W=$S/fiber_eval_work
