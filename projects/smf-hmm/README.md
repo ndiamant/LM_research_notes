@@ -7,6 +7,7 @@
 
 ## Notes
 
+- 2026-11-18: [Sequence-free vs AlphaGenome prior: sequence-free wins raw AUROC (0.797 vs 0.774), AlphaGenome wins stratified AUROC, ρ and AUPRC; the prior labels other factors' footprints as TF and assigns footprints to neighbouring motifs](2026-11-18/fiber-sequence-free-vs-alphagenome-prior.md)
 - 2026-11-18: [TF 15-60 + other_long 61-100: TF takes the 41-60 bp patches (mostly bound CTCF); best AUROC, ρ and prior log-odds, but lower AUPRC (CREM, YY1) and 31% more off-motif TF](2026-11-18/fiber-tf60-other-long-61-100.md)
 - 2026-11-17: [TF 15-60: small gains (ρ within bound 0.232) from removing the 40 bp cap; TF barely uses 41-60 bp because its duration prior favours other_long there](2026-11-17/fiber-tf-15-60.md)
 - 2026-11-17: [Variable-length nucleosome: 100-190 bp matches base AUROC, best AUPRC and off-motif TF, removes most other_long; 100-147 costs AUROC; lengths largely follow the duration prior](2026-11-17/fiber-variable-length-nucleosome.md)

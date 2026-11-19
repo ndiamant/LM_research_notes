@@ -583,8 +583,14 @@ read fully supports the call. The prior's TF bump at the motif (about 0.3) comes
 - **Nucleosome length prior.** Lengths largely follow the 15 bp-scale prior. Would a tighter prior, or
   a spike at 147 bp plus a broad tail, keep the gains?
 - **Clustered protection in open DNA** is still unmodelled.
-- **Informative vs constant prior.** A sequence-free (constant) prior scores AUROC 0.796, above every
-  informative prior. This is unexplained.
+- **Informative vs constant prior.** A sequence-free (constant) prior scores higher raw AUROC: 0.797 vs
+  0.774 for option B. The AlphaGenome prior wins stratified AUROC, ρ within bound and matched AUPRC.
+  The [sequence-free comparison](fiber-sequence-free-vs-alphagenome-prior.md) traces the raw-AUROC gap
+  to two effects:
+  - the prior labels other factors' real footprints at unbound benchmark motifs as TF;
+  - it assigns footprints to a stronger neighbouring motif.
+
+  Can a TF-specific or window-scored version keep the gains without these costs?
 
 # Sources
 
