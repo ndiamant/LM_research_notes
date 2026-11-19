@@ -456,8 +456,8 @@ panel and the green heatmap on each site overview.
 - **Limitations.** It blurs footprint edges by about 7 bp, and it cannot tell a TF footprint from other
   protection of the same length.
 
-The specificity metrics use the same kernel. A read is a confident footprint when the kernel averages
-> 0.8 over the motif and < 0.2 over both 10-30 bp flanks. `ref_kernel` is a site's share of confident
+The specificity metrics use the same kernel. A read is a confident footprint when the kernel
+averages above 0.8 over the motif and below 0.2 over both 10-30 bp flanks. `ref_kernel` is a site's share of confident
 footprints among confident reads.
 
 ![Kernel P(bound) with both other_long options](fiberseq-model-components/kernel_crem_read23_two_models.png)
