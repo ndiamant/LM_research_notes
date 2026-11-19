@@ -13,12 +13,11 @@ tags: [smf-hmm, fiberseq, report, model-design]
 
 # Summary
 
-**What this is.** A concise description of the current GM12878 Fiber-seq HMM. Each component gets what
-it is, why it is there, and the key evidence for it. The development history is in the
+**What this is.** A description of the current GM12878 Fiber-seq HMM. Components are described with evidence supporting their inclusion. The development history is in the
 [long report](../2026-11-17/fiberseq-model-report.md) and the notes it links.
 
 **Conventions.**
-- Metrics are on the validation chromosomes (chr8, chr20), with the trained prior as is (prior ×1).
+- Metrics are on the validation chromosomes (chr8, chr20).
 - The test chromosomes (chr1, chr3, chr6) were never evaluated.
 - "Base" means the first Fiber-seq model (2026-10-22): the mESC SMF design applied to m6A calls unchanged.
 - Code: [smf_hmm, branch `nd/experiments`](https://github.com/ndiamant/smf_hmm/tree/nd/experiments). The model components are in
@@ -49,15 +48,16 @@ tail. The prior adds one tied potential per block.*
 |---|---|---|
 | 1 | single TF state with a protection floor | one TF state that must look protected, instead of four groups that absorbed labelling variation |
 | 2 | open spacers around TF | every TF call is flanked by ≥ 10 bp of open DNA and cannot chain into the next |
-| 3 | TF length 15-60 bp | no 8 bp "nubs"; long CTCF-like footprints fit in TF |
+| 3 | TF length 15-60 bp | avoids 8 bp spurious TFs; long CTCF-like footprints fit in TF |
 | 4 | flexible nucleosome with fuzzy edges | 100-190 bp, peaked at 147 bp, with 40 bp tapered edges at both ends |
 | 5 | rare other_long | a 1% catch-all for protected stretches between TF and nucleosome; two range options remain |
 | 6 | context-bias correction | a learned ±3 bp m6A context offset shared by all states |
-| 7 | AlphaGenome encoder prior with a residual GELU head | a frozen pretrained DNA encoder; a head that does not die |
-| 8 | tied prior potentials | the prior says where each element is, not how long it is |
-| 9 | occupancy targets with strong regularization | the prior's state occupancy pinned to realistic targets (KL weight 300) |
+| 7 | AlphaGenome encoder prior with a residual GELU head | a frozen pretrained DNA encoder; GELU preserves gradients during training |
+| 8 | tied prior potentials | each microstate has same potential within a state group |
+| 9 | occupancy targets with strong regularization | the prior's state occupancy pinned to "realistic" targets (KL weight 300) |
 
 **Overall effect** (§10):
+(metrics defined later)
 - accessibility-stratified AUROC 0.629 → 0.688-0.690;
 - within-bound ρ 0.111 → 0.232-0.246;
 - prior TF log-odds 0.38 → 1.08-1.19;
