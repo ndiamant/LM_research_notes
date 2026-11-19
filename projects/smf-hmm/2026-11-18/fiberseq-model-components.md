@@ -374,7 +374,7 @@ Val chromosomes, prior ×1, 9 TFs (CTCF, NRF1, USF2, CREM, RFX5, EBF1, PAX5, SPI
 - **Averaging.** Every metric is computed per TF and then averaged over the 9 TFs with equal weight.
 
 **Per-site quantities.**
-- **Site score** $ar p$: the model's posterior P(TF), averaged over all reads in the window, then over
+- **Site score** $\bar p$: the model's posterior P(TF), averaged over all reads in the window, then over
   the motif's positions. P(TF) sums all TF states.
 - **Accessibility** $a$: the fraction of calls that are m6A within ±25 bp of the motif, over all reads.
   It is model-free.
@@ -384,11 +384,11 @@ Val chromosomes, prior ×1, 9 TFs (CTCF, NRF1, USF2, CREM, RFX5, EBF1, PAX5, SPI
 
 | metric | computed as |
 |---|---|
-| IDR AUROC | AUROC of $ar p$ for bound vs unbound sites (all reads) |
+| IDR AUROC | AUROC of $\bar p$ for bound vs unbound sites (all reads) |
 | accessibility-stratified AUROC | sites split into 5 quantile bins of $a$; AUROC within each bin; average weighted by each bin's number of bound × unbound pairs. Only compares sites of similar accessibility, so a model cannot win by scoring accessible sites high. All reads are used. |
 | protected-read AUROC | as IDR AUROC, but each site's score averages P(TF) over the motif using only reads with ≥ 1 protected call inside the motif, on sites with ≥ 3 such reads. Asks whether the model tells TF footprints from other protection (mostly nucleosomes), regardless of how much TF it puts on unprotected reads. |
-| ρ within bound sites | over bound sites only: partial Spearman correlation between ChIP signal and $ar p$, after linearly regressing the ranks of $a$ out of both ranks. Asks whether, among truly bound sites, more ChIP signal means more P(TF) beyond what accessibility explains. All reads are used, not only protected ones. |
-| accessibility-matched AUPRC | positives: bound sites with ChIP ≥ the median of that TF's bound sites. Negatives: unbound sites drawn 3 per positive within 10 accessibility bins (deciles of the positives' $a$). Score $ar p$; average precision. 100 resamples (positives bootstrapped, negatives redrawn), averaged. A random score gives 0.25. Penalises TF calls at unbound sites of the same accessibility, which the AUROCs tolerate. |
+| ρ within bound sites | over bound sites only: partial Spearman correlation between ChIP signal and $\bar p$, after linearly regressing the ranks of $a$ out of both ranks. Asks whether, among truly bound sites, more ChIP signal means more P(TF) beyond what accessibility explains. All reads are used, not only protected ones. |
+| accessibility-matched AUPRC | positives: bound sites with ChIP ≥ the median of that TF's bound sites. Negatives: unbound sites drawn 3 per positive within 10 accessibility bins (deciles of the positives' $a$). Score $\bar p$; average precision. 100 resamples (positives bootstrapped, negatives redrawn), averaged. A random score gives about 0.27: 0.25 where every bin has enough unbound sites, more where a bin has fewer. Penalises TF calls at unbound sites of the same accessibility, which the AUROCs tolerate. |
 | off-motif TF per read-kb | all val windows: positions with P(TF) > 0.5 that lie outside ±5 bp of every strong PWM hit, counted over reads and divided by read-kb (reads × 0.512 kb). The PWMs are 100 motifs (the 91 footprint-screen TFs plus the 9 benchmark motifs), at FPR 1e-5, both strands. A TF call longer than its motif also counts its flanks beyond ±5 bp. |
 | prior TF log-odds | from the prior alone (prior-only marginals, no reads): each site's prior P(TF) averaged over the motif; logit(median over bound sites) − logit(median over unbound sites). How much the sequence prior alone moves TF log-odds at bound vs unbound motifs. |
 
@@ -396,11 +396,15 @@ Val chromosomes, prior ×1, 9 TFs (CTCF, NRF1, USF2, CREM, RFX5, EBF1, PAX5, SPI
   resampled within TF, 500 draws), not shown here.
 - **Seed noise.** Across seeds the AUROC SD is about 0.001 and the log-odds SD about 0.02, so AUROC
   differences of ≥ 0.005 are probably real.
-- **Code:**
-  - `evaluation/tf_chip/analyze_covariation.py`: site scores, accessibility, IDR labels, AUROC helpers.
-  - `fiber_eval_work/idr_split_summary.py`: pooled val metrics and the bootstrap.
-  - `fiber_eval_work/kernel_ref/specificity_metrics.py`: matched AUPRC and off-motif TF.
-  - `evaluation/tf_chip/prior_tf_log_odds.py`: prior TF log-odds.
+- **Code** (all tracked in smf_hmm `evaluation/tf_chip/`, commit 1d86e57):
+  - `analyze_covariation.py --idr-peaks`: per-chromosome site table with site scores, accessibility,
+    ChIP and IDR labels.
+  - `idr_split_summary.py`: IDR AUROC, stratified AUROC, protected-read AUROC and ρ within bound,
+    pooled over the val chromosomes, with the bootstrap.
+  - `specificity_metrics.py`: matched AUPRC, off-motif TF and the kernel read check. Its motif set and
+    kernel reference are in `references/`.
+  - `prior_tf_log_odds.py`: prior TF log-odds.
+  - The ports reproduce the earlier scratch outputs exactly.
 
 # Details
 
