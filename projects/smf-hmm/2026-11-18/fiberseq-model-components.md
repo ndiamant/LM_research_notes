@@ -473,6 +473,41 @@ matching the open calls.*
 light = accessible, white = no informative call), reads sorted by protection over the CREM motif
 (yellow).*
 
+**More examples from option B** (TF 15-60, other_long 61-100).
+- One read per figure, prior ×1, background = Viterbi path.
+- Panels: calls, prior, posterior, then P(bound) with the kernel in green.
+- Reads come from the strongest IDR-bound site of each TF on the val chromosomes.
+- All 80 figures are in `/scratch/users/diamant/gm12878_validation/ol61_kernel_examples/`.
+
+![CTCF footprint with kernel support](fiberseq-model-components/example_ctcf_read15.png)
+
+*CTCF, chr20:5,100,924, read 15: a clean footprint. TF is called over the CTCF motif (bp ~245-275)
+between two nucleosomes. The kernel is near 1 over the footprint and near 0 on the open flanks, so the
+read fully supports the call. The prior's TF bump at the motif (about 0.3) comes from sequence alone.*
+
+![Two NRF1 footprints and an uncertain patch](fiberseq-model-components/example_nrf1_read97.png)
+
+*NRF1, chr8:10,054,697, read 97.
+- TF is called at both NRF1 motif matches (bp ~200-210 and ~285-300), and the kernel is near 1 at both.
+- The 45 bp protected patch at bp ~110-155 has no motif match. The posterior splits it between TF
+  (about 0.6) and other_long, while the kernel is near 1 across it: the protection is real, its label
+  uncertain.*
+
+![Open SPI1 motif and a footprint at another motif](fiberseq-model-components/example_spi1_read47.png)
+
+*SPI1, chr8:54,508,468, read 47.
+- The SPI1 motif (bp ~205-225) is open in this read (kernel near 0), so there is no SPI1 footprint.
+- The model's TF call at bp ~255-295 overlaps a REST motif match, and the kernel is near 1 across it.
+  It is probably another factor's footprint (inferred).*
+
+![Lightly labelled read](fiberseq-model-components/example_usf2_read25.png)
+
+*USF2, chr20:62,954,406, read 25, a lightly labelled read (b_m −0.77).
+- At the USF2 motif (bp ~265-280) the kernel is low and spiky, and the model hedges (P(TF) about 0.5):
+  little evidence either way.
+- The nucleosome at bp ~330-490 begins earlier in the model than in the kernel (~370). The model's
+  tapered edge absorbs m6A calls at bp ~340-360, which the kernel reads as accessible.*
+
 
 # Details
 
