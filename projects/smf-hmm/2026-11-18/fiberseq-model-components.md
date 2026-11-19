@@ -21,6 +21,9 @@ it is, why it is there, and the key evidence for it. The development history is 
 - Metrics are on the validation chromosomes (chr8, chr20), with the trained prior as is (prior ×1).
 - The test chromosomes (chr1, chr3, chr6) were never evaluated.
 - "Base" means the first Fiber-seq model (2026-10-22): the mESC SMF design applied to m6A calls unchanged.
+- Code: [smf_hmm, branch `nd/experiments`](https://github.com/ndiamant/smf_hmm/tree/nd/experiments). The model components are in
+  [697bf74](https://github.com/ndiamant/smf_hmm/commit/697bf74), the metrics in [1d86e57](https://github.com/ndiamant/smf_hmm/commit/1d86e57), and the kernel overlay in
+  [3f5efb3](https://github.com/ndiamant/smf_hmm/commit/3f5efb3). How to train and evaluate is in [Details](#details).
 
 **The model in one paragraph.** Each read is a sequence of A/T calls: m6A (accessible) or unmethylated
 (protected). A hidden-state chain explains them with four state groups: open, TF, other_long and
@@ -406,8 +409,112 @@ Val chromosomes, prior ×1, 9 TFs (CTCF, NRF1, USF2, CREM, RFX5, EBF1, PAX5, SPI
   - `prior_tf_log_odds.py`: prior TF log-odds.
   - The ports reproduce the earlier scratch outputs exactly.
 
+## Model-free check: the debiased kernel
+
+The per-read plots carry a model-free estimate of protection, so a model's calls can be checked against
+the read itself. It is `evaluation/tf_chip/kernel_pbound.py`, the green line in each read's P(bound)
+panel and the green heatmap on each site overview.
+
+**How it is computed.**
+1. **Expected m6A rate if accessible.** Each A/T call $t$ of read $m$ gets
+
+   $$
+   e_t = \sigma\big(\beta + f(\text{context}_t) + b_m\big).
+   $$
+
+   - $f$ is a ±3 bp context offset (A-centred, strand-collapsed).
+   - $\beta$ is the logit labelling rate of fully accessible DNA.
+   - $b_m$ is the read's labelling efficiency.
+   - $\beta$ and $f$ were fit on the train-benchmark chromosomes. The fit is a logistic model of m6A on
+     context, neighbourhood-accessibility bins and $b_m$ bins; $\beta$ is then set from the 2% most
+     accessible sites. They ship as `references/gm12878_fiberseq_m6a_kernel_reference.npz`.
+2. **Evidence per call.** The log-likelihood ratio, protected vs accessible:
+
+   $$
+   \lambda_t =
+   \begin{cases}
+   \log \varepsilon - \log e_t & \text{m6A} \\
+   \log(1-\varepsilon) - \log(1-e_t) & \text{unmethylated,}
+   \end{cases}
+   $$
+
+   - $\varepsilon = 0.02$ is the m6A rate of protected DNA.
+   - Positions without an A/T call contribute 0.
+3. **Smoothing.** $P(\text{bound at } t) = \sigma\big(\sum_{|u - t| \le 7} \lambda_u\big)$: the
+   posterior that the DNA around $t$ is protected, under a 50:50 prior, if all calls within ±7 bp share
+   one state.
+4. **No evidence.** Positions with no informative call within ±7 bp are left blank; their value would
+   be exactly 0.5.
+
+**Reading it.**
+- **One m6A is strong evidence of access:** e.g. −2.7 nats at $e_t = 0.3$.
+- **An unmethylated call is weaker evidence of protection,** and only where methylation was expected:
+  +1.2 nats at $e_t = 0.7$, and about 0 at $e_t \approx 0$.
+- **So the kernel is near 1 only over several "should-have-methylated" unmethylated calls,** near 0
+  at m6A, and stays near 0.5 over long unmethylated stretches in blind contexts or lightly labelled
+  reads.
+- **Limitations.** It blurs footprint edges by about 7 bp, and it cannot tell a TF footprint from other
+  protection of the same length.
+
+The specificity metrics use the same kernel. A read is a confident footprint when the kernel averages
+> 0.8 over the motif and < 0.2 over both 10-30 bp flanks. `ref_kernel` is a site's share of confident
+footprints among confident reads.
+
+![Kernel P(bound) with both other_long options](fiberseq-model-components/kernel_crem_read23_two_models.png)
+
+*One read near a bound CREM motif (chr20:57,398,498, read 23), option B left and option A right; green =
+kernel P(bound). The kernel is near 1 across the ~35 bp protected patch at bp ~430-465, so the
+protection is real. Option B calls it TF, option A mostly other_long. Elsewhere the kernel is near 0,
+matching the open calls.*
+
+![Site overview with the per-read kernel](fiberseq-model-components/kernel_crem_site_overview_top.png)
+
+*The same site: calls for all 84 reads (top) and each read's kernel P(bound) (bottom; dark = protected,
+light = accessible, white = no informative call), reads sorted by protection over the CREM motif
+(yellow).*
+
+
 # Details
 
+- **How to run** (smf_hmm [`nd/experiments`](https://github.com/ndiamant/smf_hmm/tree/nd/experiments); the `hmm` conda environment unless noted).
+  Throughout:
+  - `D` is a prepared val dataset directory: one per chromosome, e.g.
+    `/scratch/users/diamant/gm12878_validation/covariation_windows_v2/chr20-512-valid90-reads10-flank128`,
+    built by `evaluation.tf_chip.select_covariation_windows` with `configs/gm12878_validation.yaml`;
+  - `RUN` is a training run directory;
+  - `EFF` is the per-read efficiency file
+    `/scratch/groups/btrippe/ndiamant/fiberseq/GM12878/h5_ont_polarity/active_efficiency.h5`.
+
+  ```bash
+  # 1. Train: the full flag set is in RUN/train.sbatch (`python -m smf_hmm.cli.train hydra.run.dir=$RUN ...`).
+  # 2. Posteriors (prior x1) and prior-only marginals, for each val chromosome D:
+  python -m smf_hmm.cli.infer_posterior $D/dataset.h5 $D/posteriors/NAME.h5 \
+      --checkpoint-dir $RUN/checkpoints --assay-type fiberseq_m6a --batch-size 32
+  python -m smf_hmm.cli.infer_posterior $D/dataset.h5 $D/posteriors/NAME_prior.h5 \
+      --checkpoint-dir $RUN/checkpoints --assay-type fiberseq_m6a --batch-size 32 --prior-only
+  # 3. Site table with IDR labels, for each D (we ran this step in the smf_clean environment):
+  P=/scratch/groups/btrippe/ndiamant/encode/GM12878_chip/by_tf
+  python -m evaluation.tf_chip.analyze_covariation $D/dataset.h5 --prediction NAME=$D/posteriors/NAME.h5 \
+      $(for tf in ctcf ebf1 yy1 spi1 pax5 nrf1 usf2 crem rfx5; do echo --idr-peaks $tf=$P/${tf^^}_pooled.bed.gz; done) \
+      --output-dir $D/ANALYSIS
+  # 4. IDR AUROC, stratified AUROC, protected-read AUROC, rho within bound (pooled val, bootstrap CIs):
+  python -m evaluation.tf_chip.idr_split_summary idr_summary.tsv --analysis ANALYSIS \
+      --split val=$D_CHR8,$D_CHR20 --model REFERENCE --model NAME
+  # 5. Matched AUPRC, off-motif TF, kernel check:
+  python -m evaluation.tf_chip.specificity_metrics specificity/ $D_CHR20 $D_CHR8 --analysis ANALYSIS \
+      --model NAME --efficiency-path $EFF
+  # 6. Prior TF log-odds:
+  python -m evaluation.tf_chip.prior_tf_log_odds prior_log_odds.tsv --analysis ANALYSIS \
+      --prior NAME_prior $D_CHR20 $D_CHR8
+  # 7. Per-read comparison plots with the kernel overlay (GPU; decodes Viterbi paths):
+  python -m evaluation.tf_chip.plot_model_comparison OUT/ $D_CHR20 $D_CHR8 --analysis ANALYSIS \
+      --motifs evaluation/tf_chip/references/gm12878_footprint_screen_motifs.json \
+      --motif-targets evaluation/tf_chip/references/gm12878_footprinting_tfs.txt \
+      --model "NAME=$RUN:label" --model "OTHER=$RUN2:label" --efficiency-path $EFF
+  ```
+
+  A site table from step 3 can hold several models (repeat `--prediction`). Steps 4-6 then compare them
+  directly. Step 4's first `--model` is the reference for the bootstrap differences.
 - **Run configs:** option A is
   `/scratch/users/diamant/2026-11-17_fiber_hist190_tf60_kl300_alphagenome_bf16/train.sbatch`; option B
   is `.../2026-11-17_fiber_hist190_tf60_ol61_kl300_alphagenome_bf16/train.sbatch`. The flags are
