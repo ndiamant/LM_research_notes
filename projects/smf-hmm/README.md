@@ -7,6 +7,7 @@
 
 ## Notes
 
+- 2026-11-19: [Pixi migration and Orbax v1 checkpointing: feasible (jaxlib up to 0.11.2 on glibc 2.17; GPU driver 550 is the real limit), not yet done](2026-11-19/pixi-migration-and-orbax-v1-checkpointing.md)
 - 2026-11-19: [CTCF footprint position across reads: about 2× the read-noise null, mostly adjacent protection; isolated footprints vary 1.8× (a few bp), mainly the 3′ edge](2026-11-19/fiber-ctcf-footprint-position-variability.md)
 - 2026-11-18: [Sequence-free vs AlphaGenome prior: sequence-free wins raw AUROC (0.797 vs 0.774), AlphaGenome wins stratified AUROC, ρ and AUPRC; the prior labels other factors' footprints as TF and assigns footprints to neighbouring motifs](2026-11-18/fiber-sequence-free-vs-alphagenome-prior.md)
 - 2026-11-18: [TF 15-60 + other_long 61-100: TF takes the 41-60 bp patches (mostly bound CTCF); best AUROC, ρ and prior log-odds, but lower AUPRC (CREM, YY1) and 31% more off-motif TF](2026-11-18/fiber-tf60-other-long-61-100.md)
