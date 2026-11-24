@@ -7,6 +7,7 @@
 
 ## Notes
 
+- 2026-11-24: [Native pixi env (JAX capped at 0.4.35 by cuDNN on glibc 2.17; orbax 0.9 checkpoint rewrite) and a JAX 0.12 Apptainer benchmark: the container is 5% slower, so stay native](2026-11-24/pixi-native-env-and-jax-container-benchmark.md)
 - 2026-11-19: [Pixi migration and Orbax v1 checkpointing: feasible (jaxlib up to 0.11.2 on glibc 2.17; GPU driver 550 is the real limit), not yet done](2026-11-19/pixi-migration-and-orbax-v1-checkpointing.md)
 - 2026-11-19: [CTCF footprint position across reads: about 2× the read-noise null, mostly adjacent protection; isolated footprints vary 1.8× (a few bp), mainly the 3′ edge](2026-11-19/fiber-ctcf-footprint-position-variability.md)
 - 2026-11-18: [Sequence-free vs AlphaGenome prior: sequence-free wins raw AUROC (0.797 vs 0.774), AlphaGenome wins stratified AUROC, ρ and AUPRC; the prior labels other factors' footprints as TF and assigns footprints to neighbouring motifs](2026-11-18/fiber-sequence-free-vs-alphagenome-prior.md)

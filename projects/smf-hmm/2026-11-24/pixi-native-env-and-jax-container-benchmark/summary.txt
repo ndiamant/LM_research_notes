@@ -1,0 +1,33 @@
+('baseline', 1) data load 116s, model build 12.7s
+('baseline', 2) data load 61s, model build 11.5s
+('baseline', 3) data load 61s, model build 11.2s
+('container', 1) data load 58s, model build 11.5s
+('container', 2) data load 56s, model build 5.3s
+('container', 3) data load 57s, model build 5.1s
+train batches/epoch: 221  steady steps per run: 201
+baseline {'python': '3.12.16', 'jax': '0.4.35', 'jaxlib': '0.4.35', 'flax': '0.10.4', 'optax': '0.2.8', 'orbax': '0.9.0', 'numpy': '2.4.6', 'glibc': 'glibc 2.17', 'smf_hmm': ['/home/users/diamant/repos/smf_hmm/.claude/worktrees/pixi-migration/smf_hmm', '__editable__.smf_hmm-0.0.0.finder.__path_hook__'], 'gpu': 'NVIDIA H100 80GB HBM3, 550.163.01', 'device': 'NVIDIA H100 80GB HBM3'}
+container {'python': '3.12.16', 'jax': '0.12.0.1', 'jaxlib': '0.12.0.1', 'flax': '0.12.12', 'optax': '0.2.8', 'orbax': '0.12.12', 'numpy': '2.4.6', 'glibc': 'glibc 2.34', 'smf_hmm': ['/home/users/diamant/repos/smf_hmm/.claude/worktrees/jax-container-bench/smf_hmm', '__editable__.smf_hmm-0.0.0.finder.__path_hook__'], 'gpu': 'NVIDIA H100 80GB HBM3, 550.163.01', 'device': 'NVIDIA H100 80GB HBM3'}
+
+env        rep first_s  [trace lower xla]   step_ms med [IQR]        data_ms dispatch_ms total_ms | pure_ms pipe_ms pure_compile_s | val_first_s val_ms last_s(bs) | peakGiB pure_peak
+baseline   1    29.2  [ 1.1  0.3  26.7]    159.9 [ 159.6, 160.2]    18.9    139.9     178.9 |  156.1   155.2    6.9 |   4.4    95.1   12.0(34) | 15.67  15.79
+baseline   2    24.1  [ 1.0  0.3  21.5]    161.0 [ 160.7, 161.4]    21.8    140.8     182.9 |  157.2   156.2    7.0 |   4.6    96.4   12.0(34) | 15.67  15.82
+baseline   3    23.9  [ 1.0  0.3  21.5]    160.7 [ 160.5, 161.0]    20.8    140.3     181.6 |  156.9   156.1    7.1 |   4.6    96.0   11.9(34) | 15.67  15.82
+container  1    38.1  [ 0.8  0.3  36.5]    169.1 [ 167.8, 169.8]    20.6    159.0     189.6 |  165.2   164.0    2.9 |   2.1    94.6   11.4(34) | 13.29  13.32
+container  2    34.0  [ 0.8  0.3  32.3]    169.4 [ 168.5, 170.3]    20.3    159.2     190.0 |  166.3   164.8    2.7 |   2.0    95.2   11.2(34) | 13.28  13.29
+container  3    33.7  [ 0.8  0.3  32.1]    169.5 [ 168.6, 170.6]    21.8    160.0     191.4 |  166.4   165.1    3.0 |   2.0    95.5   10.9(34) | 13.30  13.30
+
+first      baseline    25.74 ± 2.99 s   container    35.27 ± 2.47 s   baseline/container = 0.730
+med        baseline   160.53 ± 0.59 ms   container   169.33 ± 0.24 ms   baseline/container = 0.948
+tot        baseline   181.12 ± 2.04 ms   container   190.35 ± 0.95 ms   baseline/container = 0.952
+pure_pipe  baseline   155.82 ± 0.53 ms   container   164.64 ± 0.60 ms   baseline/container = 0.946
+val_med    baseline    95.83 ± 0.70 ms   container    95.12 ± 0.46 ms   baseline/container = 1.007
+val_first  baseline     4.54 ± 0.12 s   container     2.04 ± 0.02 s   baseline/container = 2.227
+peak       baseline    15.67 ± 0.00 GiB   container    13.29 ± 0.01 GiB   baseline/container = 1.179
+step speedup (baseline/container median, pooled), bootstrap 95% CI: 0.949 [0.944, 0.951]
+
+baseline rep1 vs baseline rep1: same batches=True init=saved max rel loss diff (20 steps)=0.00e+00  step1 rel diff=0.00e+00  max rel diff steps 1-280=0.00e+00
+baseline rep2 vs baseline rep1: same batches=True init=loaded by key max rel loss diff (20 steps)=6.17e-06  step1 rel diff=0.00e+00  max rel diff steps 1-280=1.53e-01
+baseline rep3 vs baseline rep1: same batches=True init=loaded by key max rel loss diff (20 steps)=1.18e-05  step1 rel diff=3.19e-07  max rel diff steps 1-280=1.29e-01
+container rep1 vs baseline rep1: same batches=True init=loaded by key max rel loss diff (20 steps)=6.96e-04  step1 rel diff=3.19e-07  max rel diff steps 1-280=1.27e-01
+container rep2 vs baseline rep1: same batches=True init=loaded by key max rel loss diff (20 steps)=6.93e-04  step1 rel diff=2.13e-07  max rel diff steps 1-280=1.94e-01
+container rep3 vs baseline rep1: same batches=True init=loaded by key max rel loss diff (20 steps)=6.95e-04  step1 rel diff=3.19e-07  max rel diff steps 1-280=1.92e-01
