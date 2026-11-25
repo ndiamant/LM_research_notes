@@ -7,6 +7,7 @@
 
 ## Notes
 
+- 2026-11-24: [AT-rich context bias in option-B TF calls: the AlphaGenome prior tilts TF toward poorly labelled DNA and about 28% of those off-motif calls are unprotected in held-out calls; TF robust to molecule labelling, open/histone balance not; locked robustness checks](2026-11-24/fiber-at-rich-context-bias-robustness.md)
 - 2026-11-24: [Native pixi env (JAX capped at 0.4.35 by cuDNN on glibc 2.17; orbax 0.9 checkpoint rewrite) and a JAX 0.12 Apptainer benchmark: the container is 5% slower, so stay native](2026-11-24/pixi-native-env-and-jax-container-benchmark.md)
 - 2026-11-19: [Pixi migration and Orbax v1 checkpointing: feasible (jaxlib up to 0.11.2 on glibc 2.17; GPU driver 550 is the real limit), not yet done](2026-11-19/pixi-migration-and-orbax-v1-checkpointing.md)
 - 2026-11-19: [CTCF footprint position across reads: about 2× the read-noise null, mostly adjacent protection; isolated footprints vary 1.8× (a few bp), mainly the 3′ edge](2026-11-19/fiber-ctcf-footprint-position-variability.md)
